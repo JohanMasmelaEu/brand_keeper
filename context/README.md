@@ -15,20 +15,39 @@ Los archivos en esta carpeta proporcionan contexto detallado sobre aspectos espe
 - Esquemas de base de datos detallados
 - Guías de implementación por módulo
 
-## Estructura Sugerida
+## Archivos Disponibles
 
-Organiza los archivos por tema o módulo:
+### Documentación de Implementación
+
+- **IMPLEMENTATION.md** - Documentación completa de la implementación actual, incluyendo:
+  - Conexión con Supabase
+  - Despliegue en Vercel
+  - Integración entre ambas plataformas
+  - Configuración de seguridad
+  - Estado actual del proyecto
+
+### Configuración y Setup
+
+- **SUPABASE_SETUP.md** - Guía de configuración de Supabase para desarrollo y producción
+- **VERCEL_DEPLOYMENT.md** - Guía completa de despliegue en Vercel
+- **USER_SETUP.md** - Configuración de usuarios y roles
+- **SECURITY.md** - Consideraciones de seguridad
+
+### Base de Datos
+
+- **DATABASE_SCHEMA.sql** - Esquema completo de la base de datos
+
+## Estructura Actual
 
 ```
 context/
 ├── README.md (este archivo)
-├── database-schema.md
-├── authentication-flow.md
-├── permissions-system.md
-├── email-signature-generator.md
-├── brand-management.md
-├── user-management.md
-└── ...
+├── IMPLEMENTATION.md ⭐ (Nuevo - Estado actual de la implementación)
+├── SUPABASE_SETUP.md
+├── VERCEL_DEPLOYMENT.md
+├── USER_SETUP.md
+├── SECURITY.md
+└── DATABASE_SCHEMA.sql
 ```
 
 ## Uso
