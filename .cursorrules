@@ -138,16 +138,19 @@ Entidades principales:
   - Comentar código complejo o lógica de negocio no obvia
 
 ### Componentes UI con Shadcn
-- **Usar Shadcn UI** para todos los componentes visuales de la aplicación
+- **OBLIGATORIO**: Todo lo referente a UX o UI debe utilizar los componentes de Shadcn UI ya instalados
+- **Usar Shadcn UI** para todos los componentes visuales de la aplicación (botones, formularios, diálogos, tablas, cards, etc.)
+- **NO crear componentes UI personalizados** desde cero - siempre usar o adaptar componentes de Shadcn
 - **OBLIGATORIO**: Antes de instalar un componente de Shadcn, SIEMPRE verificar si ya existe:
   - Revisar `components/ui/` para ver si el componente ya está instalado
   - Usar `list_dir` o `glob_file_search` para buscar el archivo del componente
   - Solo instalar si el componente no existe en `components/ui/`
 - Instalar componentes usando: `pnpm dlx shadcn@latest add [component-name]`
 - Los componentes se instalan en `components/ui/`
-- Personalizar componentes según necesidades del proyecto
+- Personalizar componentes según necesidades del proyecto (modificando los archivos en `components/ui/`)
 - Usar la utilidad `cn()` de `lib/utils.ts` para combinar clases de Tailwind
 - Consultar la documentación en: https://ui.shadcn.com
+- **Principio**: Si necesitas un componente UI, primero busca en `components/ui/` - si no existe, instálalo desde Shadcn antes de crear uno personalizado
 
 ### Estructura de Archivos
 - Organizar por módulos (brands, email-signatures, users, companies)
@@ -210,3 +213,4 @@ Entidades principales:
 - Implementar logging básico para auditoría
 - Optimizar queries a Supabase con índices apropiados
 - Revisar y corregir todos los errores de ESLint antes de considerar el código completo
+- **UX/UI**: Siempre usar componentes de Shadcn UI para cualquier elemento de interfaz - no crear componentes UI desde cero

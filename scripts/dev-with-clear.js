@@ -47,24 +47,92 @@ cleanEnv.NODE_ENV = 'development'
 const isWindows = process.platform === 'win32'
 
 let nextProcess
-if (isWindows) {
-  // En Windows, usar pnpm directamente (ya que el proyecto usa pnpm)
-  // o usar el comando completo como string con shell
-  nextProcess = spawn('pnpm next dev', {
-    stdio: 'inherit',
-    shell: true, // Necesario en Windows
-    env: cleanEnv,
-    cwd: process.cwd(),
-  })
-} else {
-  // En Unix/Linux/Mac, usar pnpm directamente
-  nextProcess = spawn('pnpm', ['next', 'dev'], {
-    stdio: 'inherit',
-    shell: false,
-    env: cleanEnv,
-    cwd: process.cwd(),
-  })
+let serverReady = false
+let readyTimeout
+
+// Función para detectar cuando el servidor está listo
+// Solo verifica una vez al inicio, no continuamente
+function checkServerReady() {
+  const http = require('http')
+  let checkCount = 0
+  const maxChecks = 20 // Máximo 20 intentos (10 segundos)
+  
+  const check = () => {
+    if (checkCount >= maxChecks) {
+      console.log('\n⚠️  No se pudo verificar que el servidor esté listo, pero debería estar funcionando\n')
+      return
+    }
+    
+    checkCount++
+    const req = http.get('http://localhost:3000', { timeout: 2000 }, (res) => {
+      if (res.statusCode === 200 || res.statusCode === 404 || res.statusCode === 307 || res.statusCode === 308) {
+        // El servidor está respondiendo (incluyendo redirects)
+        if (!serverReady) {
+          serverReady = true
+          console.log('\n✅ Servidor listo en http://localhost:3000')
+          console.log('💡 Next.js hot reload está activo - los cambios se reflejarán automáticamente\n')
+        }
+        clearTimeout(readyTimeout)
+      }
+    })
+    
+    req.on('error', () => {
+      // El servidor aún no está listo, intentar de nuevo
+      if (!serverReady && checkCount < maxChecks) {
+        readyTimeout = setTimeout(check, 1000) // Verificar cada segundo
+      }
+    })
+    
+    req.on('timeout', () => {
+      req.destroy()
+      if (!serverReady && checkCount < maxChecks) {
+        readyTimeout = setTimeout(check, 1000)
+      }
+    })
+  }
+  
+  // Esperar un poco antes de empezar a verificar
+  setTimeout(check, 3000)
 }
+
+// Función para encontrar y ejecutar pnpm de manera confiable
+function spawnPnpm() {
+  // En Windows, usar shell con el comando completo para evitar problemas de PATH
+  if (isWindows) {
+    // Usar el comando completo como string con shell (más confiable en Windows)
+    return spawn('pnpm next dev', {
+      stdio: 'inherit',
+      shell: true, // Necesario en Windows cuando pnpm no está en PATH del proceso Node
+      env: cleanEnv,
+      cwd: process.cwd(),
+    })
+  }
+  
+  // En otros sistemas, intentar primero sin shell
+  try {
+    return spawn('pnpm', ['next', 'dev'], {
+      stdio: 'inherit',
+      shell: false,
+      env: cleanEnv,
+      cwd: process.cwd(),
+    })
+  } catch (error) {
+    // Si falla, usar npx como fallback
+    console.log('⚠️  pnpm no encontrado directamente, usando npx...')
+    return spawn('npx', ['pnpm', 'next', 'dev'], {
+      stdio: 'inherit',
+      shell: false,
+      env: cleanEnv,
+      cwd: process.cwd(),
+    })
+  }
+}
+
+// Ejecutar pnpm
+nextProcess = spawnPnpm()
+
+// Detectar cuando el servidor está listo
+checkServerReady()
 
 nextProcess.on('error', (error) => {
   console.error('❌ Error ejecutando Next.js:', error)
@@ -72,6 +140,7 @@ nextProcess.on('error', (error) => {
 })
 
 nextProcess.on('exit', (code) => {
+  clearTimeout(readyTimeout)
   process.exit(code || 0)
 })
 

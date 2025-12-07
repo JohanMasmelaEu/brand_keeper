@@ -3,8 +3,13 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
-export function LogoutButton() {
+interface LogoutButtonProps {
+  className?: string
+}
+
+export function LogoutButton({ className }: LogoutButtonProps) {
   const [loading, setLoading] = useState(false)
 
   const handleLogout = async () => {
@@ -33,7 +38,7 @@ export function LogoutButton() {
       onClick={handleLogout}
       disabled={loading}
       variant="outline"
-      className="w-full sm:w-auto text-sm sm:text-base"
+      className={cn("w-full sm:w-auto text-sm sm:text-base", className)}
     >
       {loading ? 'Cerrando sesión...' : 'Cerrar sesión'}
     </Button>

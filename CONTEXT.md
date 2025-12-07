@@ -331,10 +331,13 @@ Los siguientes elementos **NO** están incluidos en el MVP:
   - Mantener separación clara entre lógica de negocio y presentación
 
 ### UX/UI
+- **OBLIGATORIO**: Todo lo referente a UX o UI debe utilizar los componentes de Shadcn UI ya instalados
+- **NO crear componentes UI personalizados** desde cero - siempre usar o adaptar componentes de Shadcn
 - Interfaz intuitiva por rol
 - Feedback claro sobre permisos y restricciones
 - Vista previa en tiempo real en generador de firma
 - Navegación clara entre módulos
+- **Principio**: Si necesitas un componente UI, primero busca en `components/ui/` - si no existe, instálalo desde Shadcn antes de crear uno personalizado
 
 ---
 

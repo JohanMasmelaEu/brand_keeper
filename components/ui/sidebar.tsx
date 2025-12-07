@@ -27,7 +27,7 @@ import {
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state"
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
-const SIDEBAR_WIDTH = "16rem"
+const SIDEBAR_WIDTH = "20rem"
 const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "3rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
@@ -79,6 +79,22 @@ const SidebarProvider = React.forwardRef<
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
     const [_open, _setOpen] = React.useState(defaultOpen)
+    
+    // Read cookie state on mount
+    React.useEffect(() => {
+      if (typeof document !== "undefined") {
+        const cookies = document.cookie.split(";")
+        const sidebarCookie = cookies.find((cookie) =>
+          cookie.trim().startsWith(`${SIDEBAR_COOKIE_NAME}=`)
+        )
+        if (sidebarCookie) {
+          const value = sidebarCookie.split("=")[1]
+          if (value === "true" || value === "false") {
+            _setOpen(value === "true")
+          }
+        }
+      }
+    }, [])
     const open = openProp ?? _open
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {

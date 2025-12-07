@@ -2,7 +2,6 @@ import { redirect } from 'next/navigation'
 import { getUserProfile } from '@/lib/supabase/user'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { LogoutButton } from '@/components/logout-button'
 import type { UserRole } from '@/lib/types/user'
 
 // Función helper para obtener el título del dashboard según el rol
@@ -230,22 +229,17 @@ export default async function Dashboard() {
   }
 
   return (
-    <div className="container mx-auto">
-      <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex-1 min-w-0">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 break-words">
-            {getDashboardTitle(profile.role)}
-          </h1>
-          <p className="text-sm sm:text-base text-muted-foreground break-words">
-            Bienvenido, {profile.full_name || profile.email}
-          </p>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1 break-words">
-            Empresa: {profile.company?.name || 'N/A'}
-          </p>
-        </div>
-        <div className="flex-shrink-0">
-          <LogoutButton />
-        </div>
+    <div className="w-full">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 break-words">
+          {getDashboardTitle(profile.role)}
+        </h1>
+        <p className="text-sm sm:text-base text-muted-foreground break-words">
+          Bienvenido, {profile.full_name || profile.email}
+        </p>
+        <p className="text-xs sm:text-sm text-muted-foreground mt-1 break-words">
+          Empresa: {profile.company?.name || 'N/A'}
+        </p>
       </div>
 
       <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
