@@ -44,16 +44,18 @@ export function PageLoader({ isLoading = true }: PageLoaderProps) {
       }`}
     >
       <div className="flex flex-col items-center justify-center">
-        <Image
-          src="/images/LOGO_LOADER.png"
-          alt="Cargando..."
-          width={200}
-          height={200}
-          className={`${
-            isFading ? 'fade-out-smooth' : 'opacity-100 animate-pulse'
-          }`}
-          priority
-        />
+        <div className="relative w-[200px] h-[200px]">
+          <Image
+            src="/images/LOGO_LOADER.png"
+            alt="Cargando..."
+            fill
+            sizes="200px"
+            className={`object-contain ${
+              isFading ? 'fade-out-smooth' : 'opacity-100 animate-pulse'
+            }`}
+            priority
+          />
+        </div>
       </div>
     </div>
   )

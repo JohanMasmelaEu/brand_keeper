@@ -156,7 +156,20 @@ function LoginForm() {
       {/* Lado derecho - Formulario */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-background">
         <Card className="w-full max-w-lg border-0">
-          <CardHeader className="space-y-2 px-6 pt-8 sm:px-8 sm:pt-10">
+          {/* Logo visible solo en móvil - dentro del Card al inicio */}
+          <div className="lg:hidden w-full flex justify-center pt-6 pb-4 px-6">
+            <div className="relative w-full max-w-[280px] sm:max-w-[320px] aspect-[2/1]">
+              <Image
+                src="/images/LOGO_CORE_LOGIN.png"
+                alt="Samtel Logo"
+                width={350}
+                height={175}
+                className="w-full h-full object-contain"
+                priority
+              />
+            </div>
+          </div>
+          <CardHeader className="space-y-2 px-6 pt-8 sm:px-8 sm:pt-10 lg:pt-8">
             <CardTitle className="text-4xl font-bold sm:text-5xl text-center">Brand Keeper</CardTitle>
             <CardDescription className="text-base sm:text-lg text-center">
               Inicia sesión en tu cuenta para continuar

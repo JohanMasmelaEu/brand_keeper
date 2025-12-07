@@ -44,6 +44,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import type { UserRole } from "@/lib/types/user"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface AppSidebarProps {
   userRole: UserRole
@@ -121,6 +122,7 @@ export function AppSidebar({ userRole, userName, userEmail, companyName }: AppSi
   const [isCompanyOpen, setIsCompanyOpen] = React.useState(false)
   const { state } = useSidebar()
   const isCollapsed = state === "collapsed"
+  const isMobile = useIsMobile()
 
   // Filtrar items según el rol del usuario
   const filteredNavItems = navItems.filter((item) => item.roles.includes(userRole))
@@ -220,8 +222,8 @@ export function AppSidebar({ userRole, userName, userEmail, companyName }: AppSi
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              side="right"
-              className="w-56"
+              side={isMobile ? "top" : "right"}
+              className={isMobile ? "w-[calc(100vw-1rem)] max-w-xs" : "w-56"}
               sideOffset={8}
             >
               <DropdownMenuLabel>
