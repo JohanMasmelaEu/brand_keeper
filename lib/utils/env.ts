@@ -15,12 +15,17 @@ export function getAppUrl(): string {
   }
 
   // Servidor: usar variable de entorno o fallback
-  return (
-    process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "http://localhost:3000"
-  )
+  // Prioridad: NEXT_PUBLIC_APP_URL > VERCEL_URL > localhost
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL
+  }
+
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`
+  }
+
+  // Fallback para desarrollo local
+  return "http://localhost:3000"
 }
 
 /**

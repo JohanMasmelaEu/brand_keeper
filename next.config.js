@@ -9,6 +9,11 @@ const nextConfig = {
       },
     ],
   },
+  // Optimizaciones para Vercel
+  poweredByHeader: false,
+  compress: true,
+  // Nota: Vercel maneja el output automáticamente, no necesitamos 'standalone'
+  // que puede causar problemas de permisos en Windows durante el build local
 }
 
 module.exports = nextConfig

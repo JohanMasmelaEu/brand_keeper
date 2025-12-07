@@ -36,11 +36,16 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet: Array<{ name: string; value: string; options?: { path?: string; domain?: string; maxAge?: number; expires?: Date; httpOnly?: boolean; secure?: boolean; sameSite?: 'strict' | 'lax' | 'none' } }>) {
+        setAll(cookiesToSet) {
           const isProduction = process.env.NODE_ENV === 'production'
           const isHTTPS = request.url.startsWith('https://')
           
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          // Actualizar las cookies en el request
+          cookiesToSet.forEach(({ name, value }) => {
+            request.cookies.set(name, value)
+          })
+          
+          // Crear nueva respuesta con las cookies actualizadas
           supabaseResponse = NextResponse.next({
             request,
           })
@@ -50,20 +55,27 @@ export async function updateSession(request: NextRequest) {
             // Para cookies de autenticación de Supabase, aplicar seguridad
             const isAuthCookie = name.startsWith('sb-') && name.includes('auth')
             
-            const secureOptions = {
-              path: options?.path || '/',
-              domain: options?.domain, // No establecer domain por defecto (más seguro)
-              maxAge: options?.maxAge,
-              expires: options?.expires,
-              // httpOnly: true para cookies de servidor (pero Supabase SSR maneja esto)
-              httpOnly: options?.httpOnly ?? (isAuthCookie ? true : false),
-              // secure: true solo en producción con HTTPS
-              secure: options?.secure ?? (isProduction && isHTTPS),
-              // sameSite: 'lax' previene CSRF mientras permite navegación normal
-              sameSite: (options?.sameSite || 'lax') as 'strict' | 'lax' | 'none',
+            // Normalizar sameSite: convertir boolean a string si es necesario
+            let sameSiteValue: 'strict' | 'lax' | 'none' | undefined = 'lax'
+            if (options?.sameSite) {
+              if (typeof options.sameSite === 'string') {
+                sameSiteValue = options.sameSite as 'strict' | 'lax' | 'none'
+              } else if (options.sameSite === true) {
+                sameSiteValue = 'strict'
+              } else {
+                sameSiteValue = 'lax'
+              }
             }
             
-            supabaseResponse.cookies.set(name, value, secureOptions)
+            supabaseResponse.cookies.set(name, value, {
+              path: options?.path || '/',
+              domain: options?.domain,
+              maxAge: options?.maxAge,
+              expires: options?.expires,
+              httpOnly: options?.httpOnly ?? (isAuthCookie ? true : false),
+              secure: options?.secure ?? (isProduction && isHTTPS),
+              sameSite: sameSiteValue,
+            })
           })
         },
       },

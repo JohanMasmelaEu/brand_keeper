@@ -138,12 +138,39 @@ import { cn } from "@/lib/utils"
 <div className={cn("base-classes", condition && "conditional-classes")} />
 ```
 
+## Despliegue en Vercel
+
+Este proyecto está configurado para desplegarse en Vercel. La configuración incluye:
+
+- **Configuración automática**: Vercel detecta Next.js y configura el build automáticamente
+- **Integración con Supabase**: Si tienes la extensión de Vercel instalada en Supabase, las variables de entorno se sincronizan automáticamente
+- **Optimizaciones**: Configuración optimizada para producción con headers de seguridad
+
+### Guía de Despliegue
+
+Consulta la guía completa en [context/VERCEL_DEPLOYMENT.md](./context/VERCEL_DEPLOYMENT.md) que incluye:
+- Pasos detallados para desplegar desde el dashboard de Vercel
+- Configuración de variables de entorno
+- Integración con Supabase
+- Troubleshooting común
+- Configuración de dominio personalizado
+
+### Despliegue Rápido
+
+1. Conecta tu repositorio en [vercel.com](https://vercel.com)
+2. Si tienes la extensión de Vercel en Supabase, las variables se sincronizan automáticamente
+3. Si no, configura manualmente las variables de entorno (ver guía completa)
+4. Haz clic en "Deploy"
+
 ## Documentación
 
 Para más detalles sobre el contexto, alcance y arquitectura del proyecto, consulta:
 - [CONTEXT.md](./CONTEXT.md) - Contexto completo y alcance detallado del MVP
 - [.cursorrules](./.cursorrules) - Reglas, convenciones y stack técnico del proyecto
 - [context/](./context/) - Documentación específica sobre temas particulares de la aplicación
+  - [VERCEL_DEPLOYMENT.md](./context/VERCEL_DEPLOYMENT.md) - Guía completa de despliegue en Vercel
+  - [SUPABASE_SETUP.md](./context/SUPABASE_SETUP.md) - Configuración de Supabase
+  - [SECURITY.md](./context/SECURITY.md) - Consideraciones de seguridad
 
 ## Estado del Proyecto
 

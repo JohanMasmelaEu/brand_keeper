@@ -83,14 +83,17 @@ export function validateCookieSecurity(cookieName: string, options: {
   secure?: boolean
   sameSite?: 'strict' | 'lax' | 'none'
 }): void {
-  if (process.env.NODE_ENV === 'development') {
+  const nodeEnv = process.env.NODE_ENV
+  if (nodeEnv === 'development') {
     const warnings: string[] = []
     
     if (cookieName.startsWith('sb-') && options.httpOnly === false) {
       // Esto es esperado para cookies del cliente, no es un warning
     }
     
-    if (process.env.NODE_ENV === 'production' && !options.secure) {
+    // Nota: Esta validación solo se ejecuta en desarrollo como advertencia
+    // En producción, las cookies deben tener secure=true
+    if (!options.secure && nodeEnv !== 'development') {
       warnings.push(`Cookie ${cookieName} debe tener secure=true en producción`)
     }
     

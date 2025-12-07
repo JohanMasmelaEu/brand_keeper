@@ -1,0 +1,34 @@
+# Archivos y carpetas a ignorar en el despliegue de Vercel
+
+# Dependencias (se instalan en Vercel)
+node_modules/
+
+# Archivos de desarrollo
+.env.local
+.env.development
+.env.test
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Scripts de desarrollo local
+scripts/create-test-users.ts
+scripts/dev-with-clear.js
+nodemon.json
+
+# Documentación (opcional, puedes incluirla si quieres)
+# context/
+

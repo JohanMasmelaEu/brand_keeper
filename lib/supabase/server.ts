@@ -12,11 +12,26 @@ export async function createClient() {
         getAll() {
           return cookieStore.getAll()
         },
-        setAll(cookiesToSet: Array<{ name: string; value: string; options?: { path?: string; domain?: string; maxAge?: number; expires?: Date; httpOnly?: boolean; secure?: boolean; sameSite?: 'strict' | 'lax' | 'none' } }>) {
+        setAll(cookiesToSet) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            )
+            cookiesToSet.forEach(({ name, value, options }) => {
+              // Normalizar sameSite: convertir boolean a string si es necesario
+              let sameSiteValue: 'strict' | 'lax' | 'none' | undefined = undefined
+              if (options?.sameSite) {
+                if (typeof options.sameSite === 'string') {
+                  sameSiteValue = options.sameSite as 'strict' | 'lax' | 'none'
+                } else if (options.sameSite === true) {
+                  sameSiteValue = 'strict'
+                } else {
+                  sameSiteValue = undefined
+                }
+              }
+              
+              cookieStore.set(name, value, {
+                ...options,
+                sameSite: sameSiteValue,
+              })
+            })
           } catch {
             // The `setAll` method was called from a Server Component.
             // This can be ignored if you have middleware refreshing
