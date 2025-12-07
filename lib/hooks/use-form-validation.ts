@@ -3,19 +3,21 @@
  * Proporciona una interfaz consistente para todos los formularios de la aplicación
  */
 
-import { useForm, UseFormProps, UseFormReturn } from "react-hook-form"
+import { useForm, UseFormProps, UseFormReturn, FieldValues } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { useState } from "react"
 
-export interface UseFormValidationOptions<T extends z.ZodTypeAny> {
+// Restricción: solo aceptamos schemas que produzcan objetos (FieldValues)
+// Esto asegura compatibilidad con React Hook Form
+export interface UseFormValidationOptions<T extends z.ZodObject<any>> {
   schema: T
   defaultValues?: UseFormProps<z.infer<T>>["defaultValues"]
   onSubmit: (data: z.infer<T>) => Promise<void> | void
   onError?: (error: unknown) => void
 }
 
-export interface FormValidationResult<T extends z.ZodTypeAny> {
+export interface FormValidationResult<T extends z.ZodObject<any>> {
   form: UseFormReturn<z.infer<T>>
   onSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>
   isSubmitting: boolean
@@ -42,7 +44,7 @@ export interface FormValidationResult<T extends z.ZodTypeAny> {
  * })
  * ```
  */
-export function useFormValidation<T extends z.ZodTypeAny>({
+export function useFormValidation<T extends z.ZodObject<any>>({
   schema,
   defaultValues,
   onSubmit,
@@ -52,7 +54,7 @@ export function useFormValidation<T extends z.ZodTypeAny>({
   const [error, setError] = useState<string | null>(null)
 
   const form = useForm<z.infer<T>>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as any,
     defaultValues,
     mode: "onChange", // Validar mientras el usuario escribe
   })

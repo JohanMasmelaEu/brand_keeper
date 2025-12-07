@@ -66,7 +66,7 @@ export const registerUserSchema = z.object({
   full_name: fullNameSchema,
   phone: phoneSchema,
   role: z.enum(["super_admin", "admin", "collaborator"], {
-    errorMap: () => ({ message: "El rol seleccionado no es válido" }),
+    message: "El rol seleccionado no es válido",
   }),
   company_id: z.string().uuid("El ID de la empresa no es válido").optional(),
 })
