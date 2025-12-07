@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { DevBadge } from "@/components/dev-badge";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "Brand Keeper - Plataforma de Gestión de Marca",
@@ -17,6 +18,7 @@ export default function RootLayout({
       <body suppressHydrationWarning>
         {children}
         <DevBadge />
+        <SpeedInsights />
       </body>
     </html>
   );
