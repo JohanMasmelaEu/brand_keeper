@@ -23,75 +23,75 @@ function getDashboardTitle(role: UserRole): string {
 function SuperAdminCards() {
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle>Gestión de Empresas</CardTitle>
-          <CardDescription>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Gestión de Empresas</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Administra empresas matriz e hijas
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button className="w-full">Gestionar Empresas</Button>
+        <CardContent className="pt-0 flex-1 flex items-end">
+          <Button className="w-full text-sm sm:text-base">Gestionar Empresas</Button>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Usuarios</CardTitle>
-          <CardDescription>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Usuarios</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Administra usuarios y permisos
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button className="w-full">Gestionar Usuarios</Button>
+        <CardContent className="pt-0 flex-1 flex items-end">
+          <Button className="w-full text-sm sm:text-base">Gestionar Usuarios</Button>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Configuración de Marca</CardTitle>
-          <CardDescription>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Configuración de Marca</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Configura la marca matriz
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button className="w-full">Configurar Marca</Button>
+        <CardContent className="pt-0 flex-1 flex items-end">
+          <Button className="w-full text-sm sm:text-base">Configurar Marca</Button>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Activos de Marca</CardTitle>
-          <CardDescription>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Activos de Marca</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Gestiona recursos globales
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button className="w-full">Ver Activos</Button>
+        <CardContent className="pt-0 flex-1 flex items-end">
+          <Button className="w-full text-sm sm:text-base">Ver Activos</Button>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Plantillas de Firma</CardTitle>
-          <CardDescription>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Plantillas de Firma</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Administra plantillas globales
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button className="w-full">Gestionar Plantillas</Button>
+        <CardContent className="pt-0 flex-1 flex items-end">
+          <Button className="w-full text-sm sm:text-base">Gestionar Plantillas</Button>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Manual de Marca</CardTitle>
-          <CardDescription>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Manual de Marca</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Visualiza el manual generado
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button className="w-full">Ver Manual</Button>
+        <CardContent className="pt-0 flex-1 flex items-end">
+          <Button className="w-full text-sm sm:text-base">Ver Manual</Button>
         </CardContent>
       </Card>
     </>
@@ -102,63 +102,63 @@ function SuperAdminCards() {
 function AdminCards() {
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle>Configuración de Marca</CardTitle>
-          <CardDescription>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Configuración de Marca</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Configura la marca de tu empresa
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button className="w-full">Configurar Marca</Button>
+        <CardContent className="pt-0 flex-1 flex items-end">
+          <Button className="w-full text-sm sm:text-base">Configurar Marca</Button>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Activos de Marca</CardTitle>
-          <CardDescription>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Activos de Marca</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Gestiona recursos de tu empresa
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button className="w-full">Ver Activos</Button>
+        <CardContent className="pt-0 flex-1 flex items-end">
+          <Button className="w-full text-sm sm:text-base">Ver Activos</Button>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Colaboradores</CardTitle>
-          <CardDescription>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Colaboradores</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Gestiona colaboradores de tu empresa
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button className="w-full">Gestionar Colaboradores</Button>
+        <CardContent className="pt-0 flex-1 flex items-end">
+          <Button className="w-full text-sm sm:text-base">Gestionar Colaboradores</Button>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Plantillas de Firma</CardTitle>
-          <CardDescription>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Plantillas de Firma</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Administra plantillas de tu empresa
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button className="w-full">Gestionar Plantillas</Button>
+        <CardContent className="pt-0 flex-1 flex items-end">
+          <Button className="w-full text-sm sm:text-base">Gestionar Plantillas</Button>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Manual de Marca</CardTitle>
-          <CardDescription>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Manual de Marca</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Visualiza el manual de tu empresa
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button className="w-full">Ver Manual</Button>
+        <CardContent className="pt-0 flex-1 flex items-end">
+          <Button className="w-full text-sm sm:text-base">Ver Manual</Button>
         </CardContent>
       </Card>
     </>
@@ -169,39 +169,39 @@ function AdminCards() {
 function CollaboratorCards() {
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle>Activos de Marca</CardTitle>
-          <CardDescription>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Activos de Marca</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Explora recursos disponibles
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button className="w-full">Ver Activos</Button>
+        <CardContent className="pt-0 flex-1 flex items-end">
+          <Button className="w-full text-sm sm:text-base">Ver Activos</Button>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Generador de Firma</CardTitle>
-          <CardDescription>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Generador de Firma</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Crea tu firma de correo personalizada
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button className="w-full">Generar Firma</Button>
+        <CardContent className="pt-0 flex-1 flex items-end">
+          <Button className="w-full text-sm sm:text-base">Generar Firma</Button>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Manual de Marca</CardTitle>
-          <CardDescription>
+      <Card className="h-full flex flex-col">
+        <CardHeader className="pb-3 sm:pb-4">
+          <CardTitle className="text-base sm:text-lg lg:text-xl">Manual de Marca</CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
             Consulta lineamientos de marca
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Button className="w-full">Ver Manual</Button>
+        <CardContent className="pt-0 flex-1 flex items-end">
+          <Button className="w-full text-sm sm:text-base">Ver Manual</Button>
         </CardContent>
       </Card>
     </>
@@ -230,21 +230,25 @@ export default async function Dashboard() {
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-8 flex items-start justify-between">
-        <div>
-          <h1 className="text-4xl font-bold mb-2">{getDashboardTitle(profile.role)}</h1>
-          <p className="text-muted-foreground">
+    <div className="container mx-auto">
+      <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 break-words">
+            {getDashboardTitle(profile.role)}
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground break-words">
             Bienvenido, {profile.full_name || profile.email}
           </p>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1 break-words">
             Empresa: {profile.company?.name || 'N/A'}
           </p>
         </div>
-        <LogoutButton />
+        <div className="flex-shrink-0">
+          <LogoutButton />
+        </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {renderCards()}
       </div>
     </div>

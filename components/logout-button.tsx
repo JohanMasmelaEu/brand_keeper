@@ -33,7 +33,7 @@ export function LogoutButton() {
       onClick={handleLogout}
       disabled={loading}
       variant="outline"
-      className="ml-auto"
+      className="w-full sm:w-auto text-sm sm:text-base"
     >
       {loading ? 'Cerrando sesión...' : 'Cerrar sesión'}
     </Button>
