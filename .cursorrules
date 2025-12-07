@@ -1,0 +1,212 @@
+# Brand Keeper - Reglas del Proyecto
+
+## Contexto del Proyecto
+Brand Keeper es una plataforma corporativa de gestión de marca diseñada para centralizar, gestionar y distribuir todos los elementos de marca de una empresa matriz y sus empresas hijas. El objetivo es asegurar consistencia visual, facilitar el acceso a recursos oficiales y permitir que cada compañía gestione solo lo correspondiente a su propia identidad, bajo un modelo controlado de permisos.
+
+## Entorno de Desarrollo
+
+**IMPORTANTE**: Al iniciar una sesión de desarrollo, SIEMPRE pregunta al usuario en qué Sistema Operativo está desarrollando y qué shell está utilizando. Esto es crítico para proporcionar comandos correctos.
+
+**Configuración Actual del Proyecto**:
+- **Sistema Operativo**: Windows
+- **Shell**: PowerShell (PWS)
+- **Nota**: Todos los comandos y scripts deben ser compatibles con PowerShell. Si el usuario está en otro SO (Linux, macOS), adapta los comandos según corresponda.
+
+### Comandos y Scripts
+- **Usar sintaxis de PowerShell** para todos los comandos de terminal
+- **No usar comandos Unix/Linux** a menos que el usuario esté en ese entorno
+- Ejemplos de comandos PowerShell:
+  - `Get-ChildItem` en lugar de `ls` (aunque `ls` funciona como alias)
+  - `New-Item` en lugar de `touch`
+  - `Remove-Item` en lugar de `rm`
+  - Rutas con backslash `\` o usar rutas con forward slash `/` (ambas funcionan en PowerShell)
+  - Variables de entorno: `$env:VARIABLE_NAME` en lugar de `$VARIABLE_NAME`
+
+## Stack Tecnológico
+- **Gestor de Paquetes**: PNPM
+- **Lenguaje**: TypeScript (obligatorio para todo el código)
+- **Frontend**: Next.js 15 (App Router), Server Components, Tailwind CSS
+- **Componentes UI**: Shadcn UI (componentes accesibles basados en Radix UI)
+- **Backend**: Next.js API Route Handlers, Supabase (Auth, Database, Storage)
+- **Linting y Calidad de Código**: ESLint (validación de estándares de código)
+- **Despliegue**: Vercel (Frontend y Backend)
+- **Base de Datos**: Supabase/PostgreSQL
+- **Autenticación**: Supabase Auth
+- **Storage**: Supabase Storage con RLS
+
+## Estructura de la Aplicación
+
+### Jerarquía de Empresas
+- **Empresa Matriz**: Control total de configuración
+- **Empresas Hijas**: Cada una con su propia configuración de marca restringida
+- Relación jerárquica simple: cada usuario pertenece a la empresa matriz o a una empresa hija
+
+### Roles y Permisos
+1. **Super Admin** (Empresa Matriz)
+   - Gestión de todas las empresas y configuraciones
+   - Acceso total a todos los módulos
+   - Puede crear/editar/eliminar empresas hijas
+   - Puede asignar roles a cualquier usuario
+
+2. **Admin** (Empresa Hija o Matriz)
+   - Solo gestiona contenidos de su propia empresa
+   - No puede ver/edit contenidos de otras empresas
+   - Puede crear y gestionar colaboradores de su empresa
+   - No puede gestionar empresas hijas ni configuraciones globales
+
+3. **Colaborador**
+   - Acceso de solo lectura y uso
+   - Ve contenidos de su empresa y de la matriz (liberados globalmente)
+   - No puede editar ni cargar contenido
+   - Puede generar su firma de correo
+
+## Módulos del MVP
+
+### 1. Gestión de Marcas
+- Configuración de marca (logo, colores, tipografías, variantes)
+- Librería de activos (imágenes, documentos, organización por carpetas)
+- Manual de marca básico (generado automáticamente)
+
+### 2. Generador de Firma de Correo
+- Plantillas centrales administradas
+- Formulario para colaborador con validación
+- Vista previa en tiempo real
+- Exportación (HTML al portapapeles o descarga)
+
+### 3. Administración de Usuarios
+- Creación/edición/desactivación de usuarios
+- Asignación a empresa y rol
+- Perfil básico editable
+- Control estricto de accesos cruzados
+
+## Principios de Desarrollo
+
+### Arquitectura
+- Usar Server Components cuando aplique
+- Rendering SSR y SSG según el módulo
+- Interfaz modular por rol
+- Middleware de validación por rol y empresa
+
+### Base de Datos (Supabase/Postgres)
+Entidades principales:
+- `users` - Usuarios del sistema
+- `companies` - Empresa matriz e hijas
+- `brand_settings` - Configuraciones de marca
+- `brand_assets` - Activos de marca
+- `email_signature_templates` - Plantillas de firma
+- `permissions` / `roles` - Control de permisos
+- `audit_logs` - Auditoría mínima
+
+### Seguridad
+- Row Level Security (RLS) en Supabase
+- Validación de permisos en middleware
+- Control estricto de accesos cruzados entre empresas
+- Políticas de storage basadas en empresa y rol
+
+## Convenciones de Código
+
+### Gestor de Paquetes
+- **Usar PNPM** para todas las operaciones de paquetes
+- Comandos: `pnpm install`, `pnpm add`, `pnpm dev`, `pnpm build`, etc.
+- No usar `npm` o `yarn` en este proyecto
+- **Nota**: Los comandos de PNPM funcionan igual en todos los sistemas operativos, pero asegúrate de que cualquier script personalizado use sintaxis compatible con el SO del usuario
+- **OBLIGATORIO**: Antes de agregar cualquier dependencia o paquete, SIEMPRE validar si ya está instalada:
+  - Revisar `package.json` para paquetes npm
+  - Revisar `components/ui/` para componentes de Shadcn UI
+  - Usar `grep` o `codebase_search` para verificar si el componente/paquete ya existe
+  - Solo instalar si no existe o si es una versión diferente requerida
+
+### TypeScript
+- **OBLIGATORIO**: Todo el código debe estar escrito en TypeScript
+- Usar tipos estrictos para todas las funciones, componentes y variables
+- Definir interfaces y tipos para todas las estructuras de datos
+- Evitar el uso de `any` - usar `unknown` cuando sea necesario y hacer type guards
+- Generar tipos de Supabase usando `supabase gen types typescript`
+- Mantener archivos de tipos organizados en `lib/types/`
+- Usar tipos inferidos cuando sea apropiado, pero preferir tipos explícitos para APIs públicas
+
+### ESLint y Estándares de Código
+- **OBLIGATORIO**: Todo el código debe pasar las validaciones de ESLint
+- Ejecutar `pnpm lint` antes de hacer commit
+- Resolver todos los warnings y errors de ESLint
+- La configuración de ESLint está en `.eslintrc.json` y usa `eslint-config-next`
+- Reglas adicionales:
+  - No dejar código comentado sin justificación
+  - No usar `console.log` en producción (usar sistema de logging apropiado)
+  - Mantener funciones pequeñas y con responsabilidad única
+  - Usar nombres descriptivos para variables y funciones
+  - Comentar código complejo o lógica de negocio no obvia
+
+### Componentes UI con Shadcn
+- **Usar Shadcn UI** para todos los componentes visuales de la aplicación
+- **OBLIGATORIO**: Antes de instalar un componente de Shadcn, SIEMPRE verificar si ya existe:
+  - Revisar `components/ui/` para ver si el componente ya está instalado
+  - Usar `list_dir` o `glob_file_search` para buscar el archivo del componente
+  - Solo instalar si el componente no existe en `components/ui/`
+- Instalar componentes usando: `pnpm dlx shadcn@latest add [component-name]`
+- Los componentes se instalan en `components/ui/`
+- Personalizar componentes según necesidades del proyecto
+- Usar la utilidad `cn()` de `lib/utils.ts` para combinar clases de Tailwind
+- Consultar la documentación en: https://ui.shadcn.com
+
+### Estructura de Archivos
+- Organizar por módulos (brands, email-signatures, users, companies)
+- Separar componentes de servidor y cliente claramente
+- Usar TypeScript para type safety
+- Mantener lógica de negocio en server actions o API routes
+- Componentes UI de Shadcn en `components/ui/`
+
+### Carpeta de Contexto
+- **La carpeta `context/`** contiene documentación específica sobre temas particulares de la aplicación
+- **Siempre consultar** los archivos en `context/` antes de trabajar en un tema específico
+- Los archivos en `context/` proporcionan detalles técnicos, flujos de negocio, arquitectura de módulos y especificaciones
+- **Actualizar** los archivos de contexto cuando se implementen cambios o nuevas funcionalidades
+- Si necesitas entender un aspecto específico del proyecto, busca primero en `context/` antes de hacer suposiciones
+
+### Nomenclatura
+- Usar nombres descriptivos que reflejen la jerarquía (company, brand, asset)
+- Prefijos claros para roles (super-admin, admin, collaborator)
+- Convenciones consistentes para componentes (PascalCase) y funciones (camelCase)
+
+### Validaciones
+- Validar permisos en cada operación crítica
+- Verificar pertenencia a empresa antes de mostrar/editar datos
+- Validar roles antes de permitir acciones administrativas
+- Usar middleware para validaciones comunes
+
+## Consideraciones Especiales
+
+### Control de Acceso
+- Los Admins solo ven/editan contenidos de su empresa
+- Los Colaboradores ven contenidos de su empresa + matriz (globales)
+- Super Admin tiene acceso total
+- Implementar validaciones en múltiples capas (UI, API, DB)
+
+### Gestión de Activos
+- Control de visibilidad: global (matriz) vs empresa específica
+- Organización por carpetas o categorías
+- Formatos soportados: PNG, JPG, SVG (imágenes), PDF, ZIP, DOCX (documentos)
+
+### Generador de Firma
+- Estilos inline para compatibilidad con clientes de correo
+- Autocompletado de sitio web según empresa
+- Validación por política corporativa
+- Renderización HTML con identidad visual aplicada
+
+## Fuera de Alcance en el MVP
+- Versionado de recursos
+- Editor avanzado de plantillas (drag and drop)
+- Sistema de notificaciones
+- Integración con Active Directory o Google Workspace
+- Soporte multilenguaje
+- Automatización de actualización de firmas por API
+
+## Buenas Prácticas
+- Documentar todas las funciones de validación de permisos
+- Incluir comentarios sobre reglas de negocio implementadas
+- Mantener separación clara entre lógica de negocio y presentación
+- **TypeScript estricto**: Usar configuración estricta de TypeScript para prevenir errores de tipo
+- **Validación de código**: Ejecutar `pnpm lint` regularmente y antes de commits
+- Implementar logging básico para auditoría
+- Optimizar queries a Supabase con índices apropiados
+- Revisar y corregir todos los errores de ESLint antes de considerar el código completo

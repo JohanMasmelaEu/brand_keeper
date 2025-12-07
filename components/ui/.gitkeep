@@ -1,0 +1,3 @@
+# Esta carpeta contiene los componentes de Shadcn UI
+# Los componentes se instalan usando: pnpm dlx shadcn@latest add [component-name]
+

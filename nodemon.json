@@ -1,0 +1,33 @@
+{
+  "watch": [
+    "app",
+    "components",
+    "lib",
+    "middleware.ts",
+    "next.config.js",
+    "tailwind.config.ts",
+    "tsconfig.json",
+    "postcss.config.js"
+  ],
+  "ext": "ts,tsx,js,jsx,json,css",
+  "ignore": [
+    "node_modules",
+    ".next",
+    ".git",
+    "*.test.ts",
+    "*.test.tsx",
+    "*.spec.ts",
+    "*.spec.tsx",
+    "scripts"
+  ],
+  "exec": "node scripts/dev-with-clear.js",
+  "env": {
+    "NODE_ENV": "development"
+  },
+  "colours": true,
+  "legacyWatch": false,
+  "verbose": false,
+  "delay": 500,
+  "signal": "SIGTERM"
+}
+
