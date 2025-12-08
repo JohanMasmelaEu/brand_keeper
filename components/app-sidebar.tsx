@@ -162,7 +162,7 @@ export function AppSidebar({ userRole, userName, userEmail, companyName }: AppSi
             />
           </div>
           <div
-            className={`flex flex-col items-center transition-opacity duration-200 ${
+            className={`flex flex-col items-center transition-all duration-300 ease-in-out ${
               isCollapsed ? "opacity-0 h-0 overflow-hidden" : "opacity-100"
             }`}
           >
@@ -174,7 +174,7 @@ export function AppSidebar({ userRole, userName, userEmail, companyName }: AppSi
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Platform</SidebarGroupLabel>
+          <SidebarGroupLabel>Funcionalidades</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {filteredNavItems.map((item) => {
@@ -182,10 +182,10 @@ export function AppSidebar({ userRole, userName, userEmail, companyName }: AppSi
                 const isActive = pathname === item.href || pathname?.startsWith(item.href + "/")
                 return (
                   <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={item.href}>
-                        <Icon />
-                        <span>{item.title}</span>
+                    <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
+                      <Link href={item.href} className="flex items-center gap-2 w-full">
+                        <span className={`md:text-xl transition-[opacity,width,max-width,color] duration-300 ease-in-out ${isActive ? "text-white" : ""}`}>{item.title}</span>
+                        <Icon className={`h-6 w-6 shrink-0 transition-all duration-300 ease-in-out ${isActive ? "text-primary" : ""}`} />
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -211,9 +211,9 @@ export function AppSidebar({ userRole, userName, userEmail, companyName }: AppSi
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col items-start min-w-0 flex-1">
-                    <span className="text-sm font-medium truncate w-full">{userName || "User"}</span>
+                    <span className="text-sm md:text-xl font-medium truncate w-full">{userName || "User"}</span>
                     {userEmail && (
-                      <span className="text-xs text-muted-foreground truncate w-full">{userEmail}</span>
+                      <span className="text-xs md:text-lg text-muted-foreground truncate w-full">{userEmail}</span>
                     )}
                   </div>
                 </div>
