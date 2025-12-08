@@ -14,8 +14,6 @@ import {
   LayoutDashboard,
   ChevronDown,
   User,
-  CreditCard,
-  Bell,
   LogOut,
 } from "lucide-react"
 
@@ -45,12 +43,14 @@ import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/client"
 import type { UserRole } from "@/lib/types/user"
 import { useIsMobile } from "@/hooks/use-mobile"
+import { UserProfileModal } from "@/components/user-profile-modal"
 
 interface AppSidebarProps {
   userRole: UserRole
   userName?: string | null
   userEmail?: string | null
   companyName?: string | null
+  avatarUrl?: string | null
 }
 
 interface NavItem {
@@ -117,9 +117,10 @@ const navItems: NavItem[] = [
   },
 ]
 
-export function AppSidebar({ userRole, userName, userEmail, companyName }: AppSidebarProps) {
+export function AppSidebar({ userRole, userName, userEmail, companyName, avatarUrl }: AppSidebarProps) {
   const pathname = usePathname()
   const [isCompanyOpen, setIsCompanyOpen] = React.useState(false)
+  const [isProfileModalOpen, setIsProfileModalOpen] = React.useState(false)
   const { state } = useSidebar()
   const isCollapsed = state === "collapsed"
   const isMobile = useIsMobile()
@@ -204,14 +205,14 @@ export function AppSidebar({ userRole, userName, userEmail, companyName }: AppSi
                 className="w-full justify-start p-2 h-auto hover:bg-sidebar-accent"
               >
                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <Avatar className="h-8 w-8 shrink-0">
-                    <AvatarImage src={undefined} alt={userName || "User"} />
-                    <AvatarFallback className="text-xs">
+                  <Avatar className="h-12 w-12 shrink-0">
+                    <AvatarImage src={avatarUrl || undefined} alt={userName || "Usuario"} />
+                    <AvatarFallback className="text-sm">
                       {getInitials(userName, userEmail)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col items-start min-w-0 flex-1">
-                    <span className="text-sm md:text-xl font-medium truncate w-full">{userName || "User"}</span>
+                    <span className="text-sm md:text-xl font-medium truncate w-full">{userName || "Usuario"}</span>
                     {userEmail && (
                       <span className="text-xs md:text-lg text-muted-foreground truncate w-full">{userEmail}</span>
                     )}
@@ -228,34 +229,35 @@ export function AppSidebar({ userRole, userName, userEmail, companyName }: AppSi
             >
               <DropdownMenuLabel>
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium">{userName || "User"}</span>
+                  <span className="text-sm font-medium">{userName || "Usuario"}</span>
                   {userEmail && (
                     <span className="text-xs text-muted-foreground font-normal">{userEmail}</span>
                   )}
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setIsProfileModalOpen(true)}>
                 <User className="mr-2 h-4 w-4" />
-                <span>Account</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard className="mr-2 h-4 w-4" />
-                <span>Billing</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell className="mr-2 h-4 w-4" />
-                <span>Notifications</span>
+                <span>Perfil</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
+                <span>Cerrar sesión</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </SidebarFooter>
+      <UserProfileModal
+        open={isProfileModalOpen}
+        onOpenChange={setIsProfileModalOpen}
+        userName={userName}
+        userEmail={userEmail}
+        userRole={userRole}
+        companyName={companyName}
+        avatarUrl={avatarUrl}
+      />
     </Sidebar>
   )
 }

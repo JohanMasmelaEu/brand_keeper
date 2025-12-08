@@ -78,6 +78,7 @@ export const updateProfileSchema = z.object({
   full_name: fullNameSchema.optional(),
   phone: phoneSchema,
   email: emailSchema.optional(),
+  avatar_url: urlSchema,
 })
 
 /**
