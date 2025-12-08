@@ -326,16 +326,21 @@ export function UserProfileModal({
               </div>
             )}
 
-            <DialogFooter>
+            <DialogFooter className="gap-2 sm:gap-3">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
                 disabled={isSubmitting || isUpdating}
+                className="flex-1 sm:flex-initial"
               >
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isSubmitting || isUpdating}>
+              <Button 
+                type="submit" 
+                disabled={isSubmitting || isUpdating}
+                className="flex-1 sm:flex-initial"
+              >
                 {(isSubmitting || isUpdating) && (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 )}
