@@ -432,9 +432,164 @@ Durante la configuración inicial, se resolvieron los siguientes problemas:
 - ✅ ESLint sin errores
 - ✅ Aplicación lista para producción
 
+## Funcionalidades de Usuario Implementadas ✅
+
+### Gestión de Perfil de Usuario ✅ COMPLETADO
+
+**Estado**: Implementado y Funcionando - Diciembre 2024
+
+#### Modal de Perfil de Usuario
+
+- ✅ **Componente `UserProfileModal`** (`components/user-profile-modal.tsx`)
+  - Modal para editar información personal del usuario
+  - Integrado con el menú desplegable del sidebar
+  - Muestra información del usuario: nombre, email, rol, empresa
+  - Campos editables: nombre completo
+  - Campos de solo lectura: email, rol, empresa (con mensajes informativos)
+
+#### Sistema de Avatar
+
+- ✅ **Subida y Recorte de Imagen**
+  - Componente `ImageCropper` (`components/image-cropper.tsx`)
+  - Recorte de imagen con aspecto 1:1 (cuadrado)
+  - Controles de zoom (zoom in, zoom out, reset)
+  - Rango de zoom: 50% a 300%
+  - Indicador de porcentaje de zoom en tiempo real
+  - Optimizado para móvil con `touch-action: none`
+  - Animación fade-in suave al aparecer
+
+- ✅ **API Routes para Avatar**
+  - `POST /api/profile/avatar` - Subida de imagen a Supabase Storage
+  - Validación de tipo de archivo (solo imágenes)
+  - Validación de tamaño (máximo 5MB)
+  - Eliminación automática de avatar anterior al subir uno nuevo
+  - Generación de nombres únicos: `{user_id}-{timestamp}.{ext}`
+  - Almacenamiento en bucket `user-avatars` en carpeta `avatars/`
+
+- ✅ **Políticas RLS para Storage**
+  - Políticas implementadas en `context/STORAGE_POLICIES_FIXED.sql`
+  - Usuarios pueden subir sus propios avatares
+  - Usuarios pueden leer sus propios avatares
+  - Usuarios pueden actualizar sus propios avatares
+  - Usuarios pueden eliminar sus propios avatares
+  - Restricción por carpeta `avatars/` y formato de nombre de archivo
+
+#### API de Perfil
+
+- ✅ **API Route `/api/profile`**
+  - `PUT /api/profile` - Actualizar perfil (nombre completo, avatar_url)
+  - `GET /api/profile` - Obtener perfil completo con información de empresa
+  - Validación con Zod (`updateProfileSchema`)
+  - Manejo robusto de errores con validación de Content-Type JSON
+  - Mensajes de error claros para el usuario
+
+#### Mejoras de UI/UX
+
+- ✅ **Sidebar Mejorado** (`components/app-sidebar.tsx`)
+  - Avatar centrado cuando el sidebar está colapsado
+  - Animaciones suaves al expandir/colapsar (500ms ease-out)
+  - Texto "Funcionalidades" con animación fade-in después de la expansión
+  - Transiciones sincronizadas entre elementos
+  - Logo con transición suave de tamaño
+  - Items del menú con transiciones mejoradas
+
+- ✅ **Espaciado de Botones**
+  - Espaciado consistente entre botones en modales
+  - `gap-2` en móvil, `gap-3` en desktop
+  - Botones con ancho flexible en móvil (`flex-1`)
+
+- ✅ **Animaciones de Loader**
+  - Animación fade-in personalizada para loaders
+  - Transición suave de opacidad (300ms)
+  - Mejor experiencia visual al mostrar estados de carga
+
+#### Validaciones y Esquemas
+
+- ✅ **Esquemas de Validación** (`lib/validations/schemas.ts`)
+  - `updateProfileSchema` con validación de `full_name` y `avatar_url`
+  - Validación de URL de avatar opcional
+  - Mensajes de error en español
+
+#### Configuración de Tailwind
+
+- ✅ **Animaciones Personalizadas** (`tailwind.config.ts`)
+  - Animación `fade-in` con scale y opacidad
+  - Duración: 300ms con `ease-out`
+  - Aplicada a loaders y elementos que aparecen dinámicamente
+
+### Archivos Creados/Modificados
+
+#### Componentes Nuevos
+- `components/user-profile-modal.tsx` - Modal de perfil de usuario
+- `components/image-cropper.tsx` - Componente de recorte de imagen
+
+#### API Routes Nuevas
+- `app/api/profile/route.ts` - API para gestión de perfil
+- `app/api/profile/avatar/route.ts` - API para subida de avatar
+
+#### Archivos Modificados
+- `components/app-sidebar.tsx` - Mejoras de UI y animaciones
+- `lib/validations/schemas.ts` - Esquema de validación de perfil
+- `tailwind.config.ts` - Animación fade-in personalizada
+- `components/ui/dialog.tsx` - Mejoras en espaciado de footer
+
+#### Scripts SQL
+- `context/STORAGE_POLICIES_FIXED.sql` - Políticas RLS para storage de avatares
+
+### Dependencias Agregadas
+
+- `react-image-crop` - Biblioteca para recorte de imágenes en el cliente
+
+### Características Técnicas
+
+#### Recorte de Imagen
+- Uso de `react-image-crop` para recorte interactivo
+- Conversión a Blob usando Canvas API
+- Cálculo correcto de coordenadas considerando zoom y escala
+- Soporte para diferentes tamaños de imagen
+- Optimización para móvil con controles táctiles mejorados
+
+#### Manejo de Errores
+- Validación de Content-Type antes de parsear JSON
+- Manejo de errores de red y conexión
+- Mensajes de error claros y específicos
+- Logging para debugging en desarrollo
+
+#### Optimizaciones
+- Eliminación automática de avatares antiguos
+- Generación de nombres únicos para evitar conflictos
+- Validación de tamaño de archivo antes de subir
+- Transiciones CSS optimizadas para rendimiento
+
+### Problemas Resueltos
+
+1. **Error de JSON inválido al guardar perfil**
+   - Solución: Validación de Content-Type antes de parsear
+   - Estado: ✅ Resuelto
+
+2. **Avatar no centrado en sidebar colapsado**
+   - Solución: Estructura condicional con `justify-center`
+   - Estado: ✅ Resuelto
+
+3. **Animaciones bruscas en sidebar**
+   - Solución: Aumento de duraciones (500ms) y easing mejorado (ease-out)
+   - Estado: ✅ Resuelto
+
+4. **Recorte de imagen incorrecto**
+   - Solución: Corrección del cálculo de coordenadas usando `image.width/height` en lugar de `getBoundingClientRect()`
+   - Estado: ✅ Resuelto
+
+5. **Imagen se desplazaba en móvil**
+   - Solución: Controles de zoom y `touch-action: none`
+   - Estado: ✅ Resuelto
+
+6. **Botones pegados en modales**
+   - Solución: Agregado `gap-2 sm:gap-3` a DialogFooter
+   - Estado: ✅ Resuelto
+
 ---
 
 **Última actualización**: Diciembre 2024
-**Versión de la implementación**: 1.0.0
-**Estado**: ✅ Infraestructura base completa y funcionando
+**Versión de la implementación**: 1.1.0
+**Estado**: ✅ Infraestructura base completa + Gestión de perfil de usuario implementada
 
