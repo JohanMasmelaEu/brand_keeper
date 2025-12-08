@@ -32,6 +32,27 @@ const SIDEBAR_WIDTH_MOBILE = "18rem"
 const SIDEBAR_WIDTH_ICON = "4.5rem"
 const SIDEBAR_KEYBOARD_SHORTCUT = "b"
 
+// Función para leer el estado del sidebar desde la cookie de forma síncrona
+function getSidebarStateFromCookie(): boolean | null {
+  if (typeof document === "undefined") {
+    return null
+  }
+  const cookies = document.cookie.split(";")
+  const sidebarCookie = cookies.find((cookie) =>
+    cookie.trim().startsWith(`${SIDEBAR_COOKIE_NAME}=`)
+  )
+  if (sidebarCookie) {
+    const value = sidebarCookie.split("=")[1]?.trim()
+    if (value === "true") {
+      return true
+    }
+    if (value === "false") {
+      return false
+    }
+  }
+  return null
+}
+
 type SidebarContextProps = {
   state: "expanded" | "collapsed"
   open: boolean
@@ -40,6 +61,7 @@ type SidebarContextProps = {
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
   toggleSidebar: () => void
+  isInitialized: boolean
 }
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null)
@@ -75,26 +97,39 @@ const SidebarProvider = React.forwardRef<
   ) => {
     const isMobile = useIsMobile()
     const [openMobile, setOpenMobile] = React.useState(false)
+    const [isInitialized, setIsInitialized] = React.useState(false)
 
     // This is the internal state of the sidebar.
     // We use openProp and setOpenProp for control from outside the component.
+    // IMPORTANTE: Siempre inicializar con defaultOpen para evitar discrepancias de hidratación
+    // El estado real se sincronizará después del mount en el cliente
     const [_open, _setOpen] = React.useState(defaultOpen)
-    
-    // Read cookie state on mount
-    React.useEffect(() => {
+
+    // Sincronizar el estado con la cookie después del mount para evitar problemas de hidratación
+    // y marcar como inicializado para habilitar transiciones
+    React.useLayoutEffect(() => {
       if (typeof document !== "undefined") {
-        const cookies = document.cookie.split(";")
-        const sidebarCookie = cookies.find((cookie) =>
-          cookie.trim().startsWith(`${SIDEBAR_COOKIE_NAME}=`)
-        )
-        if (sidebarCookie) {
-          const value = sidebarCookie.split("=")[1]
-          if (value === "true" || value === "false") {
-            _setOpen(value === "true")
-          }
+        // Leer el estado del atributo data establecido por el script inline
+        const dataState = document.documentElement.getAttribute('data-sidebar-initial-state')
+        const cookieState = getSidebarStateFromCookie()
+        
+        let shouldBeOpen = defaultOpen
+        if (dataState === 'collapsed') {
+          shouldBeOpen = false
+        } else if (dataState === 'expanded') {
+          shouldBeOpen = true
+        } else if (cookieState !== null) {
+          shouldBeOpen = cookieState
+        }
+        
+        // Sincronizar el estado si es diferente
+        if (shouldBeOpen !== _open) {
+          _setOpen(shouldBeOpen)
         }
       }
-    }, [])
+      setIsInitialized(true)
+    }, [_open])
+
     const open = openProp ?? _open
     const setOpen = React.useCallback(
       (value: boolean | ((value: boolean) => boolean)) => {
@@ -147,8 +182,9 @@ const SidebarProvider = React.forwardRef<
         openMobile,
         setOpenMobile,
         toggleSidebar,
+        isInitialized,
       }),
-      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+      [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar, isInitialized]
     )
 
     return (
@@ -164,9 +200,12 @@ const SidebarProvider = React.forwardRef<
             }
             className={cn(
               "group/sidebar-wrapper flex min-h-svh w-full has-[[data-variant=inset]]:bg-sidebar",
+              // Deshabilitar transiciones hasta que esté inicializado para evitar flash
+              !isInitialized && "[&_*]:!transition-none",
               className
             )}
             ref={ref}
+            suppressHydrationWarning
             {...props}
           >
             {children}
@@ -197,7 +236,7 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { isMobile, state, openMobile, setOpenMobile } = useSidebar()
+    const { isMobile, state, openMobile, setOpenMobile, isInitialized } = useSidebar()
 
     if (collapsible === "none") {
       return (
@@ -246,11 +285,14 @@ const Sidebar = React.forwardRef<
         data-collapsible={state === "collapsed" ? collapsible : ""}
         data-variant={variant}
         data-side={side}
+        suppressHydrationWarning
       >
         {/* This is what handles the sidebar gap on desktop */}
         <div
           className={cn(
-            "relative w-[--sidebar-width] bg-transparent transition-[width] duration-300 ease-in-out",
+            "relative w-[--sidebar-width] bg-transparent",
+            // Deshabilitar transiciones hasta que esté inicializado
+            isInitialized ? "transition-[width] duration-300 ease-in-out" : "",
             "group-data-[collapsible=offcanvas]:w-0",
             "group-data-[side=right]:rotate-180",
             variant === "floating" || variant === "inset"
@@ -260,7 +302,9 @@ const Sidebar = React.forwardRef<
         />
         <div
           className={cn(
-            "fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] transition-[left,right,width] duration-300 ease-in-out md:flex",
+            "fixed inset-y-0 z-10 hidden h-svh w-[--sidebar-width] md:flex",
+            // Deshabilitar transiciones hasta que esté inicializado
+            isInitialized ? "transition-[left,right,width] duration-300 ease-in-out" : "",
             side === "left"
               ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
               : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
@@ -603,13 +647,20 @@ const SidebarMenuButton = React.forwardRef<
       }
     }
 
+    // Only show tooltip when sidebar is collapsed and not on mobile
+    const shouldShowTooltip = state === "collapsed" && !isMobile
+
+    // If tooltip shouldn't be shown, just return the button
+    if (!shouldShowTooltip) {
+      return button
+    }
+
     return (
       <Tooltip>
         <TooltipTrigger asChild>{button}</TooltipTrigger>
         <TooltipContent
           side="right"
           align="center"
-          hidden={state !== "collapsed" || isMobile}
           {...tooltip}
         />
       </Tooltip>

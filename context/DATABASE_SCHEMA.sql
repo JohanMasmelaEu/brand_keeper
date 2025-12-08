@@ -52,6 +52,9 @@ CREATE TABLE IF NOT EXISTS companies (
   parent_company_id UUID REFERENCES companies(id) ON DELETE SET NULL,
   website VARCHAR(255),
   logo_url TEXT,
+  legal_name VARCHAR(255),
+  address TEXT,
+  country VARCHAR(100),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   

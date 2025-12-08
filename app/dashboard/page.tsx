@@ -1,8 +1,11 @@
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
+import Link from 'next/link'
 import { getUserProfile } from '@/lib/supabase/user'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import type { UserRole } from '@/lib/types/user'
+import { PageSkeleton } from '@/components/page-skeleton'
 
 // Función helper para obtener el título del dashboard según el rol
 function getDashboardTitle(role: UserRole): string {
@@ -30,7 +33,9 @@ function SuperAdminCards() {
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-0 flex-1 flex items-end">
-          <Button className="w-full text-sm sm:text-base">Gestionar Empresas</Button>
+          <Button asChild className="w-full text-sm sm:text-base">
+            <Link href="/dashboard/companies">Gestionar Empresas</Link>
+          </Button>
         </CardContent>
       </Card>
 
@@ -207,7 +212,7 @@ function CollaboratorCards() {
   )
 }
 
-export default async function Dashboard() {
+async function DashboardContent() {
   const profile = await getUserProfile()
 
   if (!profile) {
@@ -246,5 +251,19 @@ export default async function Dashboard() {
         {renderCards()}
       </div>
     </div>
+  )
+}
+
+export default async function Dashboard() {
+  const profile = await getUserProfile()
+
+  if (!profile) {
+    redirect('/login')
+  }
+
+  return (
+    <Suspense fallback={<PageSkeleton />}>
+      <DashboardContent />
+    </Suspense>
   )
 }

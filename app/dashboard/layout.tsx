@@ -4,6 +4,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { getUserProfile } from "@/lib/supabase/user"
 import { Separator } from "@/components/ui/separator"
 import { DashboardLoader } from "@/components/dashboard-loader"
+import { DashboardTransitionWrapper } from "@/components/dashboard-transition-wrapper"
 
 export default async function DashboardLayout({
   children,
@@ -18,6 +19,34 @@ export default async function DashboardLayout({
 
   return (
     <>
+      {/* Script inline solo para leer el estado del sidebar antes de la hidratación */}
+      {/* No manipulamos el DOM para evitar problemas de hidratación */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            (function() {
+              if (typeof document === 'undefined') return;
+              try {
+                // Leer el estado del sidebar desde la cookie
+                const cookies = document.cookie.split(';');
+                const sidebarCookie = cookies.find(cookie => 
+                  cookie.trim().startsWith('sidebar_state=')
+                );
+                if (sidebarCookie) {
+                  const value = sidebarCookie.split('=')[1]?.trim();
+                  if (value === 'false') {
+                    document.documentElement.setAttribute('data-sidebar-initial-state', 'collapsed');
+                  } else if (value === 'true') {
+                    document.documentElement.setAttribute('data-sidebar-initial-state', 'expanded');
+                  }
+                }
+              } catch (e) {
+                // Silently fail
+              }
+            })();
+          `,
+        }}
+      />
       <DashboardLoader />
       <SidebarProvider defaultOpen={true}>
         <AppSidebar
@@ -35,7 +64,9 @@ export default async function DashboardLayout({
             <div className="flex-1" />
           </header>
           <div className="flex flex-1 flex-col gap-4 p-4 pt-6">
-            {children}
+            <DashboardTransitionWrapper>
+              {children}
+            </DashboardTransitionWrapper>
           </div>
         </SidebarInset>
       </SidebarProvider>

@@ -127,7 +127,62 @@ export type UpdateProfileFormData = z.infer<typeof updateProfileSchema>
 export type ChangePasswordFormData = z.infer<typeof changePasswordSchema>
 
 /**
+ * Esquema de validación para creación/actualización de empresa
+ */
+export const companySchema = z.object({
+  name: z
+    .string()
+    .min(2, "El nombre debe tener al menos 2 caracteres")
+    .max(255, "El nombre no puede tener más de 255 caracteres"),
+  website: urlSchema,
+  logo_url: urlSchema,
+  legal_name: z
+    .string()
+    .min(2, "El nombre legal debe tener al menos 2 caracteres")
+    .max(255, "El nombre legal no puede tener más de 255 caracteres")
+    .optional()
+    .or(z.literal("")),
+  address: z
+    .string()
+    .max(500, "La dirección no puede tener más de 500 caracteres")
+    .optional()
+    .or(z.literal("")),
+  country: z
+    .string()
+    .min(2, "El país debe tener al menos 2 caracteres")
+    .max(100, "El país no puede tener más de 100 caracteres")
+    .optional()
+    .or(z.literal("")),
+})
+
+/**
+ * Esquema de validación para creación de empresa
+ */
+export const createCompanySchema = companySchema
+
+/**
+ * Esquema de validación para actualización de empresa
+ */
+export const updateCompanySchema = companySchema.partial().extend({
+  name: z
+    .string()
+    .min(2, "El nombre debe tener al menos 2 caracteres")
+    .max(255, "El nombre no puede tener más de 255 caracteres")
+    .optional(),
+})
+
+/**
  * Tipo inferido para configuración de marca
  */
 export type BrandSettingsFormData = z.infer<typeof brandSettingsSchema>
+
+/**
+ * Tipo inferido para creación de empresa
+ */
+export type CreateCompanyFormData = z.infer<typeof createCompanySchema>
+
+/**
+ * Tipo inferido para actualización de empresa
+ */
+export type UpdateCompanyFormData = z.infer<typeof updateCompanySchema>
 

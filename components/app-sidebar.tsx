@@ -121,13 +121,23 @@ export function AppSidebar({ userRole, userName, userEmail, companyName, avatarU
   const pathname = usePathname()
   const [isCompanyOpen, setIsCompanyOpen] = React.useState(false)
   const [isProfileModalOpen, setIsProfileModalOpen] = React.useState(false)
-  const { state } = useSidebar()
-  const isCollapsed = state === "collapsed"
+  const { state, isInitialized } = useSidebar()
   const isMobile = useIsMobile()
-  const [showLabel, setShowLabel] = React.useState(!isCollapsed)
+  // En mobile, el sidebar siempre está expandido (es un Sheet), así que no usamos isCollapsed
+  // En desktop, usamos el estado del sidebar
+  const isCollapsed = isMobile ? false : state === "collapsed"
+  // Inicializar showLabel como false para evitar discrepancias de hidratación
+  // Se actualizará después de que el sidebar esté inicializado
+  const [showLabel, setShowLabel] = React.useState(false)
 
   // Controlar la animación del label cuando el sidebar se expande
+  // Solo después de que el sidebar esté inicializado para evitar problemas de hidratación
   React.useEffect(() => {
+    if (!isInitialized) {
+      // Esperar a que el sidebar esté inicializado antes de mostrar labels
+      return
+    }
+    
     if (isCollapsed) {
       // Ocultar con un pequeño delay para suavizar la transición
       const timer = setTimeout(() => {
@@ -141,7 +151,7 @@ export function AppSidebar({ userRole, userName, userEmail, companyName, avatarU
       }, 500)
       return () => clearTimeout(timer)
     }
-  }, [isCollapsed])
+  }, [isCollapsed, isInitialized])
 
   // Filtrar items según el rol del usuario
   const filteredNavItems = navItems.filter((item) => item.roles.includes(userRole))
@@ -182,7 +192,7 @@ export function AppSidebar({ userRole, userName, userEmail, companyName, avatarU
           </div>
           <div
             className={`flex flex-col items-center transition-all duration-500 ease-out ${
-              isCollapsed ? "opacity-0 h-0 overflow-hidden max-h-0" : "opacity-100 max-h-20"
+              isCollapsed && !isMobile ? "opacity-0 h-0 overflow-hidden max-h-0" : "opacity-100 max-h-20"
             }`}
           >
             <span className="text-xl font-semibold font-sans" style={{ color: '#1b2c59' }}>
@@ -204,13 +214,35 @@ export function AppSidebar({ userRole, userName, userEmail, companyName, avatarU
             <SidebarMenu>
               {filteredNavItems.map((item) => {
                 const Icon = item.icon
-                const isActive = pathname === item.href || pathname?.startsWith(item.href + "/")
+                // Para Dashboard, solo activo si es exactamente /dashboard
+                // Para otros elementos, activo si coincide exactamente o es una subruta
+                const isActive =
+                  item.href === "/dashboard"
+                    ? pathname === "/dashboard"
+                    : pathname === item.href || pathname?.startsWith(item.href + "/")
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton asChild isActive={isActive} tooltip={item.title}>
-                      <Link href={item.href} className="flex items-center gap-2 w-full">
-                        <span className={`md:text-xl transition-[opacity,width,max-width,color] duration-500 ease-out ${isActive ? "text-white" : ""}`}>{item.title}</span>
-                        <Icon className={`h-6 w-6 shrink-0 transition-all duration-500 ease-out ${isActive ? "text-primary" : ""}`} />
+                      <Link 
+                        href={item.href} 
+                        className="flex items-center gap-2 w-full transition-all duration-300 ease-in-out"
+                      >
+                        <span 
+                          className={`md:text-xl transition-all duration-300 ease-in-out ${
+                            isActive 
+                              ? "text-white font-medium" 
+                              : "text-sidebar-foreground"
+                          }`}
+                        >
+                          {item.title}
+                        </span>
+                        <Icon 
+                          className={`h-6 w-6 shrink-0 transition-all duration-300 ease-in-out ${
+                            isActive 
+                              ? "text-primary scale-110" 
+                              : "text-sidebar-foreground"
+                          }`} 
+                        />
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -230,32 +262,25 @@ export function AppSidebar({ userRole, userName, userEmail, companyName, avatarU
                   isCollapsed ? "justify-center p-2" : "justify-start p-2"
                 }`}
               >
-                {isCollapsed ? (
+                <div className="flex items-center gap-2 flex-1 min-w-0">
                   <Avatar className="h-12 w-12 shrink-0 transition-all duration-500 ease-out">
                     <AvatarImage src={avatarUrl || undefined} alt={userName || "Usuario"} />
                     <AvatarFallback className="text-sm">
                       {getInitials(userName, userEmail)}
                     </AvatarFallback>
                   </Avatar>
-                ) : (
-                  <>
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <Avatar className="h-12 w-12 shrink-0 transition-all duration-500 ease-out">
-                        <AvatarImage src={avatarUrl || undefined} alt={userName || "Usuario"} />
-                        <AvatarFallback className="text-sm">
-                          {getInitials(userName, userEmail)}
-                        </AvatarFallback>
-                      </Avatar>
+                  {(!isCollapsed || isMobile) && (
+                    <>
                       <div className="flex flex-col items-start min-w-0 flex-1 transition-all duration-500 ease-out">
                         <span className="text-sm md:text-xl font-medium truncate w-full transition-opacity duration-500 ease-out">{userName || "Usuario"}</span>
                         {userEmail && (
                           <span className="text-xs md:text-lg text-muted-foreground truncate w-full transition-opacity duration-500 ease-out">{userEmail}</span>
                         )}
                       </div>
-                    </div>
-                    <ChevronDown className="h-4 w-4 shrink-0 ml-auto transition-opacity duration-500 ease-out" />
-                  </>
-                )}
+                      <ChevronDown className="h-4 w-4 shrink-0 ml-auto transition-opacity duration-500 ease-out" />
+                    </>
+                  )}
+                </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent

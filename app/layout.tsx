@@ -3,7 +3,7 @@ import { Nunito } from "next/font/google";
 import "./globals.css";
 import { DevBadge } from "@/components/dev-badge";
 import { DevReload } from "@/components/dev-reload";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SpeedInsightsWrapper } from "@/components/speed-insights-wrapper";
 
 const nunito = Nunito({
   subsets: ["latin"],
@@ -18,11 +18,11 @@ export const metadata: Metadata = {
   description: "Plataforma corporativa para centralizar, gestionar y distribuir elementos de marca",
 };
 
+// Configuración de viewport para evitar problemas de hidratación
+// themeColor debe estar en viewport, no en metadata según Next.js 16
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 5,
-  userScalable: true,
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
     { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
@@ -40,7 +40,7 @@ export default function RootLayout({
         {children}
         <DevBadge />
         <DevReload />
-        <SpeedInsights />
+        <SpeedInsightsWrapper />
       </body>
     </html>
   );
