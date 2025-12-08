@@ -70,42 +70,90 @@ export function UserProfileModal({
 
         // Si hay una imagen seleccionada, subirla primero
         if (selectedFile) {
-          const formData = new FormData()
-          formData.append("file", selectedFile)
+          try {
+            const formData = new FormData()
+            formData.append("file", selectedFile)
 
-          const uploadResponse = await fetch("/api/profile/avatar", {
-            method: "POST",
-            body: formData,
-          })
+            const uploadResponse = await fetch("/api/profile/avatar", {
+              method: "POST",
+              body: formData,
+            })
 
-          const uploadResult = await uploadResponse.json()
+            // Verificar si la respuesta es JSON
+            const contentType = uploadResponse.headers.get("content-type")
+            let uploadResult
 
-          if (!uploadResponse.ok) {
-            console.error("Error en upload:", uploadResult)
-            throw new Error(
-              uploadResult.error || uploadResult.details || "Error al subir la imagen"
-            )
+            if (contentType && contentType.includes("application/json")) {
+              try {
+                uploadResult = await uploadResponse.json()
+              } catch (jsonError) {
+                const text = await uploadResponse.text()
+                console.error("Error parseando JSON de upload:", jsonError)
+                console.error("Respuesta del servidor:", text)
+                throw new Error("Error al subir la imagen: respuesta inválida del servidor")
+              }
+            } else {
+              const text = await uploadResponse.text()
+              console.error("Respuesta no JSON del servidor (upload):", text)
+              throw new Error("Error al subir la imagen: respuesta inválida del servidor")
+            }
+
+            if (!uploadResponse.ok) {
+              console.error("Error en upload:", uploadResult)
+              throw new Error(
+                uploadResult.error || uploadResult.details || "Error al subir la imagen"
+              )
+            }
+
+            avatarUrlToUpdate = uploadResult.url
+          } catch (uploadError) {
+            if (uploadError instanceof Error) {
+              throw uploadError
+            }
+            throw new Error("Error inesperado al subir la imagen")
           }
-
-          avatarUrlToUpdate = uploadResult.url
         }
 
         // Llamar a la API route para actualizar el perfil
-        const response = await fetch("/api/profile", {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            full_name: data.full_name || null,
-            avatar_url: avatarUrlToUpdate !== null ? avatarUrlToUpdate : undefined,
-          }),
-        })
+        try {
+          const response = await fetch("/api/profile", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              full_name: data.full_name || null,
+              avatar_url: avatarUrlToUpdate !== null ? avatarUrlToUpdate : undefined,
+            }),
+          })
 
-        const result = await response.json()
+          // Verificar si la respuesta es JSON
+          const contentType = response.headers.get("content-type")
+          let result
 
-        if (!response.ok) {
-          throw new Error(result.error || "Error al actualizar el perfil")
+          if (contentType && contentType.includes("application/json")) {
+            try {
+              result = await response.json()
+            } catch (jsonError) {
+              const text = await response.text()
+              console.error("Error parseando JSON:", jsonError)
+              console.error("Respuesta del servidor:", text)
+              throw new Error("Error al actualizar el perfil: respuesta inválida del servidor")
+            }
+          } else {
+            const text = await response.text()
+            console.error("Respuesta no JSON del servidor (profile):", text)
+            throw new Error("Error al actualizar el perfil: respuesta inválida del servidor")
+          }
+
+          if (!response.ok) {
+            throw new Error(result.error || result.details || "Error al actualizar el perfil")
+          }
+        } catch (fetchError) {
+          if (fetchError instanceof Error) {
+            throw fetchError
+          }
+          throw new Error("Error de conexión al actualizar el perfil")
         }
 
         setUpdateSuccess(true)
@@ -342,7 +390,7 @@ export function UserProfileModal({
                 className="flex-1 sm:flex-initial"
               >
                 {(isSubmitting || isUpdating) && (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin animate-fade-in transition-opacity duration-300" />
                 )}
                 {isSubmitting || isUpdating ? "Guardando..." : "Guardar cambios"}
               </Button>

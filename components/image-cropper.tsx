@@ -316,7 +316,7 @@ export function ImageCropper({
             disabled={!completedCrop || isProcessing}
             className="flex-1 sm:flex-initial"
           >
-            {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {isProcessing && <Loader2 className="mr-2 h-4 w-4 animate-spin animate-fade-in transition-opacity duration-300" />}
             {isProcessing ? "Procesando..." : "Aplicar Recorte"}
           </Button>
         </DialogFooter>
