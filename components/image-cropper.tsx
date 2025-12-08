@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import ReactCrop, {
   type Crop,
   type PixelCrop,
@@ -158,6 +159,7 @@ export function ImageCropper({
               minHeight={100}
               className="max-w-full"
             >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 ref={imgRef}
                 alt="Crop me"
