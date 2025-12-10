@@ -158,5 +158,39 @@
     padding-top: 3rem;
     padding-bottom: 2rem;
   }
+
+  /* Animaciones para el check con sello */
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes scale-in-bounce {
+    0% {
+      opacity: 0;
+      transform: scale(0);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .animate-scale-in {
+    animation: scale-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  .animate-scale-in-bounce {
+    animation: scale-in-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
 }
 

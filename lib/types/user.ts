@@ -17,6 +17,8 @@ export interface Company {
   country: string | null
   created_at: string
   updated_at: string
+  // Relación expandida (opcional)
+  social_media?: import('./social-media').CompanySocialMedia[]
 }
 
 export interface UserProfile {

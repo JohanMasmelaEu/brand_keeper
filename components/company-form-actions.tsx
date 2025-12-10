@@ -25,11 +25,12 @@ export function CompanyFormActions({ mode, isSubmitting, form, onSubmit }: Compa
         variant="outline"
         onClick={() => router.push("/dashboard/companies")}
         disabled={isSubmitting}
+        className="font-bold"
       >
         <X className="mr-2 h-4 w-4" />
         Cancelar
       </Button>
-      <Button type="button" onClick={handleSubmit} disabled={isSubmitting}>
+      <Button type="button" onClick={handleSubmit} disabled={isSubmitting} className="font-bold">
         {mode === "create" ? (
           <>
             <Plus className="mr-2 h-4 w-4" />

@@ -3,18 +3,34 @@
 import * as React from "react"
 import type { Company } from "@/lib/types/user"
 import type { Country } from "@/lib/types/country"
+import type { CompanySocialMedia } from "@/lib/types/social-media"
+import { getSocialMediaConfig } from "@/lib/types/social-media"
 import { getCountryFlagByName } from "@/lib/utils/country"
-import { Building2, Globe, MapPin, FileText, CalendarPlus, CalendarCheck } from "lucide-react"
+import { SocialMediaIcon } from "@/components/social-media-icons"
+import { Building2, Globe, MapPin, FileText, CalendarPlus, CalendarCheck, Share2, Loader2 } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import Image from "next/image"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { CheckSealAnimation } from "@/components/check-seal-animation"
+import { Skeleton } from "@/components/ui/skeleton"
 
 interface CompanyDocumentViewProps {
   company: Company
+  socialMedia?: CompanySocialMedia[] // Prop opcional para redes sociales en tiempo real
+  isLoading?: boolean // Prop para mostrar loader
+  showSuccess?: boolean // Prop para mostrar animación de éxito
 }
 
-export function CompanyDocumentView({ company }: CompanyDocumentViewProps) {
+export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isLoading = false, showSuccess = false }: CompanyDocumentViewProps) {
   const [countries, setCountries] = React.useState<Country[]>([])
+  const [socialMedia, setSocialMedia] = React.useState<CompanySocialMedia[]>([])
+  const [isLoadingSocialMedia, setIsLoadingSocialMedia] = React.useState(false)
 
   // Cargar países al montar el componente
   React.useEffect(() => {
@@ -33,10 +49,89 @@ export function CompanyDocumentView({ company }: CompanyDocumentViewProps) {
       fetchCountries()
     }
   }, [company.country])
+
+  // Usar redes sociales de la prop si están disponibles, sino cargar desde la API
+  React.useEffect(() => {
+    // Si se pasan redes sociales como prop, usarlas directamente
+    if (propSocialMedia !== undefined) {
+      setIsLoadingSocialMedia(false)
+      // Si el array está vacío, limpiar
+      if (propSocialMedia.length === 0) {
+        setSocialMedia([])
+        return
+      }
+
+      // Si ya es un array de CompanySocialMedia completo, usarlo directamente
+      if ('id' in propSocialMedia[0] && 'company_id' in propSocialMedia[0]) {
+        const activeSocialMedia = propSocialMedia.filter(
+          (sm) => sm.url && sm.url.trim().length > 0 && sm.is_active
+        )
+        setSocialMedia(activeSocialMedia)
+      } else {
+        // Convertir el formato del formulario { type, url } al formato de CompanySocialMedia
+        const formatted = propSocialMedia
+          .filter((sm: any) => sm.url && sm.url.trim().length > 0)
+          .map((sm: any) => ({
+            id: sm.id || `temp-${sm.type}`,
+            company_id: company.id || "",
+            type: sm.type,
+            url: sm.url,
+            is_active: true,
+            created_at: sm.created_at || new Date().toISOString(),
+            updated_at: sm.updated_at || new Date().toISOString(),
+          }))
+        setSocialMedia(formatted)
+      }
+      return
+    }
+
+    // Si no hay prop, cargar desde la API
+    async function fetchSocialMedia() {
+      if (!company.id) return
+      setIsLoadingSocialMedia(true)
+      try {
+        const response = await fetch(`/api/companies/${company.id}/social-media`)
+        if (response.ok) {
+          const data = await response.json()
+          // Solo mostrar las redes sociales que tienen URL y están activas
+          const activeSocialMedia = (data.socialMedia || []).filter(
+            (sm: CompanySocialMedia) => sm.url && sm.url.trim().length > 0 && sm.is_active
+          )
+          setSocialMedia(activeSocialMedia)
+        } else {
+          // Si hay error, inicializar como array vacío
+          setSocialMedia([])
+        }
+      } catch (error) {
+        console.error("Error al cargar redes sociales:", error)
+        // En caso de error, inicializar como array vacío
+        setSocialMedia([])
+      } finally {
+        setIsLoadingSocialMedia(false)
+      }
+    }
+    fetchSocialMedia()
+  }, [company.id, propSocialMedia])
   return (
-    <div className="w-full h-full bg-white border-2 border-gray-300 rounded-lg shadow-lg p-6 sm:p-8 md:p-10 lg:p-12">
-      {/* Tipo de empresa - Arriba del todo, centrado */}
-      <div className="flex justify-center mb-6">
+    <div className="w-full h-full bg-white border-2 border-gray-300 rounded-lg shadow-2xl p-6 sm:p-8 md:p-10 lg:p-12 relative">
+      {/* Overlay de loading */}
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center rounded-lg">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-12 w-12 text-primary animate-spin" />
+            <p className="text-sm font-medium text-gray-700">Actualizando empresa...</p>
+          </div>
+        </div>
+      )}
+      
+      {/* Animación de check con sello */}
+      {showSuccess && <CheckSealAnimation variant="success" show={showSuccess} />}
+      {/* Título y Tipo de empresa - Arriba del todo */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">REGISTRO DE EMPRESA</h2>
+          <p className="text-xs text-gray-600">Brand Keeper - Sistema de Gestión</p>
+        </div>
         <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 border border-gray-300">
           <div className={`h-2 w-2 rounded-full ${company.is_parent ? 'bg-primary' : 'bg-gray-400'}`} />
           <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
@@ -48,14 +143,24 @@ export function CompanyDocumentView({ company }: CompanyDocumentViewProps) {
       {/* Encabezado del documento */}
       <div className="border-b-2 border-gray-400 pb-4 mb-6">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-              <Building2 className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">REGISTRO DE EMPRESA</h2>
-              <p className="text-xs text-gray-600">Brand Keeper - Sistema de Gestión</p>
-            </div>
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            {company.logo_url ? (
+              <div className="h-20 min-w-20 flex items-center justify-center">
+                <Image
+                  key={company.logo_url}
+                  src={company.logo_url}
+                  alt={`Logo de ${company.name}`}
+                  width={0}
+                  height={80}
+                  className="h-full w-auto max-w-full object-contain animate-in fade-in zoom-in-95 duration-500"
+                  unoptimized={company.logo_url.startsWith("http")}
+                />
+              </div>
+            ) : (
+              <div className="w-20 h-20 bg-primary/10 rounded-lg flex items-center justify-center animate-in fade-in zoom-in-95 duration-500 shrink-0">
+                <Building2 className="h-10 w-10 text-primary" />
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-4">
             {/* Fechas en el encabezado */}
@@ -83,17 +188,6 @@ export function CompanyDocumentView({ company }: CompanyDocumentViewProps) {
                 </div>
               </div>
             </div>
-            {company.logo_url && (
-              <div className="w-16 h-16 relative">
-                <Image
-                  src={company.logo_url}
-                  alt={`Logo de ${company.name}`}
-                  fill
-                  className="object-contain"
-                  unoptimized={company.logo_url.startsWith("http")}
-                />
-              </div>
-            )}
           </div>
         </div>
       </div>
@@ -163,26 +257,74 @@ export function CompanyDocumentView({ company }: CompanyDocumentViewProps) {
           </div>
         </div>
 
-        {/* Sitio Web */}
+        {/* Sitio Web y Redes Sociales */}
         <div className="border-b border-gray-200 pb-4">
-          <div className="flex items-start gap-3 mb-2">
-            <Globe className="h-5 w-5 text-gray-600 mt-0.5" />
-            <div className="flex-1">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                Sitio Web
-              </label>
-              {company.website ? (
-                <a
-                  href={company.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-base text-primary hover:underline mt-1 block"
-                >
-                  {company.website}
-                </a>
-              ) : (
-                <p className="text-base text-gray-400 italic mt-1">No especificado</p>
-              )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Sitio Web */}
+            <div className="flex items-start gap-3">
+              <Globe className="h-5 w-5 text-gray-600 mt-0.5" />
+              <div className="flex-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Sitio Web
+                </label>
+                {company.website ? (
+                  <a
+                    href={company.website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-base text-primary hover:underline mt-1 block"
+                  >
+                    {company.website}
+                  </a>
+                ) : (
+                  <p className="text-base text-gray-400 italic mt-1">No especificado</p>
+                )}
+              </div>
+            </div>
+
+            {/* Redes Sociales */}
+            <div className="flex items-start gap-3">
+              <Share2 className="h-5 w-5 text-gray-600 mt-0.5" />
+              <div className="flex-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Redes Sociales
+                </label>
+                {isLoadingSocialMedia ? (
+                  <div className="flex items-center gap-2 mt-1">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <Skeleton key={i} className="h-6 w-6 rounded-full" />
+                    ))}
+                  </div>
+                ) : socialMedia.length > 0 ? (
+                  <TooltipProvider>
+                    <div className="flex items-center gap-2 mt-1">
+                      {socialMedia.map((sm) => {
+                        const config = getSocialMediaConfig(sm.type)
+                        return (
+                          <Tooltip key={sm.id}>
+                            <TooltipTrigger asChild>
+                              <a
+                                href={sm.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-secondary hover:text-primary transition-all duration-300 ease-in-out hover:scale-125 hover:rotate-3 hover:drop-shadow-lg inline-block"
+                                aria-label={`Abrir ${config.label} en nueva pestaña`}
+                              >
+                                <SocialMediaIcon type={sm.type} size={24} />
+                              </a>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>{config.label}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        )
+                      })}
+                    </div>
+                  </TooltipProvider>
+                ) : (
+                  <p className="text-base text-gray-400 italic mt-1">No especificado</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
