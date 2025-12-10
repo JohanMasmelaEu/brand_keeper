@@ -128,7 +128,8 @@ const SidebarProvider = React.forwardRef<
         }
       }
       setIsInitialized(true)
-    }, [_open])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []) // Solo ejecutar una vez al montar
 
     const open = openProp ?? _open
     const setOpen = React.useCallback(
@@ -335,6 +336,13 @@ const SidebarTrigger = React.forwardRef<
 >(({ className, onClick, ...props }, ref) => {
   const { toggleSidebar } = useSidebar()
 
+  const handleClick = React.useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault()
+    event.stopPropagation()
+    onClick?.(event)
+    toggleSidebar()
+  }, [onClick, toggleSidebar])
+
   return (
     <Button
       ref={ref}
@@ -342,10 +350,8 @@ const SidebarTrigger = React.forwardRef<
       variant="ghost"
       size="icon"
       className={cn("h-7 w-7", className)}
-      onClick={(event) => {
-        onClick?.(event)
-        toggleSidebar()
-      }}
+      onClick={handleClick}
+      type="button"
       {...props}
     >
       <PanelLeft />

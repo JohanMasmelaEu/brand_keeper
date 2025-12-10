@@ -146,5 +146,17 @@
   .animate-flow-line {
     animation: flow-line 2s ease-in-out infinite;
   }
+
+  /* Padding generalizado para contenidos de módulos del dashboard */
+  .dashboard-module-content {
+    @apply px-4 sm:px-16;
+    /* Centrar contenido verticalmente de forma suave */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding-top: 3rem;
+    padding-bottom: 2rem;
+  }
 }
 

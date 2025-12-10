@@ -126,14 +126,6 @@ export async function PUT(
       )
     }
 
-    // No permitir editar la empresa matriz
-    if (existingCompany.is_parent) {
-      return NextResponse.json(
-        { error: "No se puede editar la empresa matriz" },
-        { status: 400 }
-      )
-    }
-
     // Obtener y validar el cuerpo de la petición
     const body = await request.json()
 

@@ -148,6 +148,13 @@ export function CompaniesOrgChart({ companies }: CompaniesOrgChartProps) {
             <span className="inline-flex items-center rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
               Matriz
             </span>
+            <div className="flex items-center gap-1 pt-1">
+              <Link href={`/dashboard/companies/${node.company.id}/edit`}>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                  <Pencil className="h-3 w-3" />
+                </Button>
+              </Link>
+            </div>
           </CardContent>
         </Card>
       )

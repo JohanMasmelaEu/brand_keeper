@@ -19,15 +19,16 @@ import { createCompanySchema, updateCompanySchema } from "@/lib/validations/sche
 import type { CreateCompanyFormData, UpdateCompanyFormData } from "@/lib/validations/schemas"
 import { useRouter } from "next/navigation"
 import type { Company } from "@/lib/types/user"
-import { format } from "date-fns"
-import { es } from "date-fns/locale"
+import { X, Plus, Save } from "lucide-react"
 
 interface CompanyFormProps {
   company?: Company
   mode: "create" | "edit"
+  onFormReady?: (form: ReturnType<typeof useForm>, isSubmitting: boolean, onSubmit: (data: any) => Promise<void>) => void
+  onFormChange?: (values: Partial<CreateCompanyFormData | UpdateCompanyFormData>) => void
 }
 
-export function CompanyForm({ company, mode }: CompanyFormProps) {
+export function CompanyForm({ company, mode, onFormReady, onFormChange }: CompanyFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
@@ -52,6 +53,39 @@ export function CompanyForm({ company, mode }: CompanyFormProps) {
           country: "",
         },
   })
+
+  // Observar cambios en el formulario para actualizar el documento en tiempo real
+  const name = form.watch("name")
+  const legal_name = form.watch("legal_name")
+  const website = form.watch("website")
+  const logo_url = form.watch("logo_url")
+  const address = form.watch("address")
+  const country = form.watch("country")
+  
+  const previousValuesRef = React.useRef<string>("")
+  
+  React.useEffect(() => {
+    if (!onFormChange) return
+    
+    const currentValues = {
+      name,
+      legal_name,
+      website,
+      logo_url,
+      address,
+      country,
+    }
+    
+    // Serializar valores para comparación
+    const currentValuesStr = JSON.stringify(currentValues)
+    
+    // Solo actualizar si los valores realmente cambiaron
+    if (currentValuesStr !== previousValuesRef.current) {
+      previousValuesRef.current = currentValuesStr
+      onFormChange(currentValues)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [name, legal_name, website, logo_url, address, country])
 
   const onSubmit = async (data: CreateCompanyFormData | UpdateCompanyFormData) => {
     setIsSubmitting(true)
@@ -85,173 +119,146 @@ export function CompanyForm({ company, mode }: CompanyFormProps) {
     }
   }
 
+  React.useEffect(() => {
+    if (onFormReady) {
+      onFormReady(form, isSubmitting, onSubmit)
+    }
+  }, [form, isSubmitting, onFormReady])
+
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nombre de la Empresa</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Ej: Empresa Hija S.A."
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                El nombre completo de la empresa (el slug se generará automáticamente)
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Row 1: Nombre de la empresa, Nombre legal */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nombre de la Empresa</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Ej: Empresa Hija S.A."
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  El nombre completo de la empresa
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="legal_name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nombre Legal</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Ej: Empresa Hija S.A. Razón Social"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                Nombre legal o razón social de la empresa (opcional)
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="legal_name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nombre Legal</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Ej: Empresa Hija S.A. Razón Social"
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Nombre legal o razón social de la empresa (opcional)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <FormField
-          control={form.control}
-          name="website"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Sitio Web</FormLabel>
-              <FormControl>
-                <Input
-                  type="url"
-                  placeholder="https://www.ejemplo.com"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                URL del sitio web de la empresa (opcional)
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Row 2: Sitio web, URL del logo */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="website"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Sitio Web</FormLabel>
+                <FormControl>
+                  <Input
+                    type="url"
+                    placeholder="https://www.ejemplo.com"
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  URL del sitio web de la empresa (opcional)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="logo_url"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>URL del Logo</FormLabel>
-              <FormControl>
-                <Input
-                  type="url"
-                  placeholder="https://www.ejemplo.com/logo.png"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                URL del logo de la empresa (opcional)
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          <FormField
+            control={form.control}
+            name="logo_url"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>URL del Logo</FormLabel>
+                <FormControl>
+                  <Input
+                    type="url"
+                    placeholder="https://www.ejemplo.com/logo.png"
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  URL del logo de la empresa (opcional)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Dirección</FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="Ej: Calle Principal 123, Ciudad, Estado"
-                  rows={3}
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                Dirección completa de la empresa (opcional)
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {/* Row 3: País, Dirección */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="country"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>País</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Ej: Colombia"
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  País donde opera la empresa (opcional)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="country"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>País</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Ej: Colombia"
-                  {...field}
-                />
-              </FormControl>
-              <FormDescription>
-                País donde opera la empresa (opcional)
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Mostrar fechas de creación y actualización si estamos editando */}
-        {mode === "edit" && company && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-muted-foreground">
-                Fecha de Creación
-              </label>
-              <p className="text-sm">
-                {format(new Date(company.created_at), "dd 'de' MMMM 'de' yyyy 'a las' HH:mm", { locale: es })}
-              </p>
-            </div>
-            <div className="space-y-1">
-              <label className="text-sm font-medium text-muted-foreground">
-                Última Actualización
-              </label>
-              <p className="text-sm">
-                {format(new Date(company.updated_at), "dd 'de' MMMM 'de' yyyy 'a las' HH:mm", { locale: es })}
-              </p>
-            </div>
-          </div>
-        )}
-
-        <div className="flex gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.push("/dashboard/companies")}
-            disabled={isSubmitting}
-          >
-            Cancelar
-          </Button>
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting
-              ? mode === "create"
-                ? "Creando..."
-                : "Actualizando..."
-              : mode === "create"
-                ? "Crear Empresa"
-                : "Actualizar Empresa"}
-          </Button>
+          <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Dirección</FormLabel>
+                <FormControl>
+                  <Textarea
+                    placeholder="Ej: Calle Principal 123, Ciudad, Estado"
+                    rows={3}
+                    {...field}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Dirección completa de la empresa (opcional)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
         </div>
       </form>
     </Form>

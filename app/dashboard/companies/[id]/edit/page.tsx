@@ -2,7 +2,7 @@ import { redirect } from "next/navigation"
 import { Suspense } from "react"
 import { getUserProfile } from "@/lib/supabase/user"
 import { getCompanyById } from "@/lib/supabase/company"
-import { CompanyForm } from "@/components/company-form"
+import { CompanyEditClient } from "./company-edit-client"
 import { FormSkeleton } from "@/components/page-skeleton"
 
 async function EditCompanyContent({
@@ -16,13 +16,8 @@ async function EditCompanyContent({
     redirect("/dashboard/companies")
   }
 
-  // No permitir editar la empresa matriz
-  if (company.is_parent) {
-    redirect("/dashboard/companies")
-  }
-
   return (
-    <div className="w-full max-w-2xl">
+    <div className="w-full">
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 break-words">
           Editar Empresa
@@ -32,7 +27,7 @@ async function EditCompanyContent({
         </p>
       </div>
 
-      <CompanyForm company={company} mode="edit" />
+      <CompanyEditClient company={company} />
     </div>
   )
 }
