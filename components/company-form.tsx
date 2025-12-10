@@ -15,11 +15,19 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { createCompanySchema, updateCompanySchema } from "@/lib/validations/schemas"
 import type { CreateCompanyFormData, UpdateCompanyFormData } from "@/lib/validations/schemas"
 import { useRouter } from "next/navigation"
 import type { Company } from "@/lib/types/user"
 import { X, Plus, Save } from "lucide-react"
+import { CountrySelect } from "@/components/country-select"
+import { cn } from "@/lib/utils"
 
 interface CompanyFormProps {
   company?: Company
@@ -119,6 +127,7 @@ export function CompanyForm({ company, mode, onFormReady, onFormChange }: Compan
     }
   }
 
+
   React.useEffect(() => {
     if (onFormReady) {
       onFormReady(form, isSubmitting, onSubmit)
@@ -172,7 +181,72 @@ export function CompanyForm({ company, mode, onFormReady, onFormChange }: Compan
           />
         </div>
 
-        {/* Row 2: Sitio web, URL del logo */}
+        {/* Row 2: País, Dirección */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <FormField
+            control={form.control}
+            name="country"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>País</FormLabel>
+                <FormControl>
+                  <CountrySelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Seleccionar país..."
+                  />
+                </FormControl>
+                <FormDescription>
+                  País donde opera la empresa (opcional)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="address"
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Dirección</FormLabel>
+                <FormControl>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Textarea
+                          placeholder="Ej: Calle Principal 123, Ciudad, Estado"
+                          rows={1}
+                          className={cn(
+                            "resize-none !min-h-[2.5rem] !h-10 overflow-hidden",
+                            field.value && field.value.length > 0 && "cursor-pointer"
+                          )}
+                          style={{ 
+                            minHeight: '2.5rem',
+                            height: '2.5rem',
+                            lineHeight: '1.25rem'
+                          }}
+                          {...field}
+                        />
+                      </TooltipTrigger>
+                      {field.value && field.value.trim().length > 0 && (
+                        <TooltipContent side="top" className="max-w-md">
+                          <p className="whitespace-pre-wrap break-words">{field.value}</p>
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
+                </FormControl>
+                <FormDescription>
+                  Dirección completa de la empresa (opcional)
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* Row 3: Sitio web, URL del logo */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
@@ -210,50 +284,6 @@ export function CompanyForm({ company, mode, onFormReady, onFormChange }: Compan
                 </FormControl>
                 <FormDescription>
                   URL del logo de la empresa (opcional)
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* Row 3: País, Dirección */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <FormField
-            control={form.control}
-            name="country"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>País</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Ej: Colombia"
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  País donde opera la empresa (opcional)
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Dirección</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Ej: Calle Principal 123, Ciudad, Estado"
-                    rows={3}
-                    {...field}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Dirección completa de la empresa (opcional)
                 </FormDescription>
                 <FormMessage />
               </FormItem>

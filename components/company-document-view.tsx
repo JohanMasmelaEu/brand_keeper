@@ -2,6 +2,8 @@
 
 import * as React from "react"
 import type { Company } from "@/lib/types/user"
+import type { Country } from "@/lib/types/country"
+import { getCountryFlagByName } from "@/lib/utils/country"
 import { Building2, Globe, MapPin, FileText, CalendarPlus, CalendarCheck } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
@@ -12,6 +14,25 @@ interface CompanyDocumentViewProps {
 }
 
 export function CompanyDocumentView({ company }: CompanyDocumentViewProps) {
+  const [countries, setCountries] = React.useState<Country[]>([])
+
+  // Cargar países al montar el componente
+  React.useEffect(() => {
+    async function fetchCountries() {
+      try {
+        const response = await fetch("/api/countries")
+        if (response.ok) {
+          const data = await response.json()
+          setCountries(data.countries || [])
+        }
+      } catch (error) {
+        console.error("Error al cargar países:", error)
+      }
+    }
+    if (company.country) {
+      fetchCountries()
+    }
+  }, [company.country])
   return (
     <div className="w-full h-full bg-white border-2 border-gray-300 rounded-lg shadow-lg p-6 sm:p-8 md:p-10 lg:p-12">
       {/* Tipo de empresa - Arriba del todo, centrado */}
@@ -127,8 +148,15 @@ export function CompanyDocumentView({ company }: CompanyDocumentViewProps) {
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                   País
                 </label>
-                <p className="text-base text-gray-900 mt-1">
-                  {company.country || <span className="text-gray-400 italic">No especificado</span>}
+                <p className="text-base text-gray-900 mt-1 flex items-center gap-2">
+                  {company.country ? (
+                    <>
+                      <span>{getCountryFlagByName(company.country, countries)}</span>
+                      <span>{company.country}</span>
+                    </>
+                  ) : (
+                    <span className="text-gray-400 italic">No especificado</span>
+                  )}
                 </p>
               </div>
             </div>
