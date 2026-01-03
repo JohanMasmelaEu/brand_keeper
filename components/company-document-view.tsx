@@ -7,7 +7,7 @@ import type { CompanySocialMedia } from "@/lib/types/social-media"
 import { getSocialMediaConfig } from "@/lib/types/social-media"
 import { getCountryFlagByName } from "@/lib/utils/country"
 import { SocialMediaIcon } from "@/components/social-media-icons"
-import { Building2, Globe, MapPin, FileText, CalendarPlus, CalendarCheck, Share2, Loader2 } from "lucide-react"
+import { Building2, Globe, MapPin, FileText, CalendarPlus, CalendarCheck, Users, Loader2, Flag, Store, Scale } from "lucide-react"
 import { format } from "date-fns"
 import { es } from "date-fns/locale"
 import Image from "next/image"
@@ -31,10 +31,16 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
   const [countries, setCountries] = React.useState<Country[]>([])
   const [socialMedia, setSocialMedia] = React.useState<CompanySocialMedia[]>([])
   const [isLoadingSocialMedia, setIsLoadingSocialMedia] = React.useState(false)
+  const [isLoadingCountries, setIsLoadingCountries] = React.useState(false)
 
   // Cargar países al montar el componente
   React.useEffect(() => {
     async function fetchCountries() {
+      if (!company.country) {
+        setIsLoadingCountries(false)
+        return
+      }
+      setIsLoadingCountries(true)
       try {
         const response = await fetch("/api/countries")
         if (response.ok) {
@@ -43,11 +49,11 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
         }
       } catch (error) {
         console.error("Error al cargar países:", error)
+      } finally {
+        setIsLoadingCountries(false)
       }
     }
-    if (company.country) {
-      fetchCountries()
-    }
+    fetchCountries()
   }, [company.country])
 
   // Usar redes sociales de la prop si están disponibles, sino cargar desde la API
@@ -87,7 +93,10 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
 
     // Si no hay prop, cargar desde la API
     async function fetchSocialMedia() {
-      if (!company.id) return
+      if (!company.id) {
+        setIsLoadingSocialMedia(false)
+        return
+      }
       setIsLoadingSocialMedia(true)
       try {
         const response = await fetch(`/api/companies/${company.id}/social-media`)
@@ -112,6 +121,110 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
     }
     fetchSocialMedia()
   }, [company.id, propSocialMedia])
+
+  // Determinar si está cargando
+  // Solo mostrar skeleton si está cargando redes sociales o países (cuando hay país)
+  const isContentLoading = isLoadingSocialMedia || (company.country ? isLoadingCountries : false)
+
+  // Skeleton del documento
+  if (isContentLoading) {
+    return (
+      <div className="w-full h-full bg-white border-2 border-gray-300 rounded-lg shadow-2xl p-6 sm:p-8 md:p-10 lg:p-12 relative">
+        {/* Título y Tipo de empresa */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <Skeleton className="h-6 w-48 mb-2" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+          <Skeleton className="h-8 w-32 rounded-full" />
+        </div>
+
+        {/* Encabezado del documento */}
+        <div className="border-b-2 border-gray-400 pb-4 mb-6">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-20 w-20 rounded-lg" />
+            <div className="flex flex-col items-end gap-2">
+              <Skeleton className="h-12 w-32" />
+              <Skeleton className="h-12 w-32" />
+            </div>
+          </div>
+        </div>
+
+        {/* Información de la empresa */}
+        <div className="space-y-6">
+          {/* Nombre de la empresa y Nombre Legal */}
+          <div className="border-b border-gray-200 pb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-start gap-3">
+                <Skeleton className="h-5 w-5 rounded mt-0.5" />
+                <div className="flex-1">
+                  <Skeleton className="h-3 w-32 mb-2" />
+                  <Skeleton className="h-5 w-40" />
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Skeleton className="h-5 w-5 rounded mt-0.5" />
+                <div className="flex-1">
+                  <Skeleton className="h-3 w-32 mb-2" />
+                  <Skeleton className="h-4 w-48" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* País y Dirección */}
+          <div className="border-b border-gray-200 pb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-start gap-3">
+                <Skeleton className="h-5 w-5 rounded mt-0.5" />
+                <div className="flex-1">
+                  <Skeleton className="h-3 w-16 mb-2" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Skeleton className="h-5 w-5 rounded mt-0.5" />
+                <div className="flex-1">
+                  <Skeleton className="h-3 w-20 mb-2" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Sitio Web y Redes Sociales */}
+          <div className="border-b border-gray-200 pb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-start gap-3">
+                <Skeleton className="h-5 w-5 rounded mt-0.5" />
+                <div className="flex-1">
+                  <Skeleton className="h-3 w-20 mb-2" />
+                  <Skeleton className="h-4 w-36" />
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Skeleton className="h-5 w-5 rounded mt-0.5" />
+                <div className="flex-1">
+                  <Skeleton className="h-3 w-24 mb-2" />
+                  <div className="flex items-center gap-2 mt-1">
+                    <Skeleton className="h-6 w-6 rounded-full" />
+                    <Skeleton className="h-6 w-6 rounded-full" />
+                    <Skeleton className="h-6 w-6 rounded-full" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Pie de página */}
+        <div className="mt-8 pt-4 border-t border-gray-300">
+          <Skeleton className="h-3 w-64 mx-auto" />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="w-full h-full bg-white border-2 border-gray-300 rounded-lg shadow-2xl p-6 sm:p-8 md:p-10 lg:p-12 relative">
       {/* Overlay de loading */}
@@ -127,7 +240,7 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
       {/* Animación de check con sello */}
       {showSuccess && <CheckSealAnimation variant="success" show={showSuccess} />}
       {/* Título y Tipo de empresa - Arriba del todo */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 animate-in fade-in slide-in-from-top-2 duration-700 ease-out">
         <div>
           <h2 className="text-xl font-bold text-gray-900">REGISTRO DE EMPRESA</h2>
           <p className="text-xs text-gray-600">Brand Keeper - Sistema de Gestión</p>
@@ -141,7 +254,7 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
       </div>
 
       {/* Encabezado del documento */}
-      <div className="border-b-2 border-gray-400 pb-4 mb-6">
+      <div className="border-b-2 border-gray-400 pb-4 mb-6 animate-in fade-in slide-in-from-top-2 duration-700 ease-out" style={{ animationDelay: '200ms' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             {company.logo_url ? (
@@ -195,10 +308,10 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
       {/* Información de la empresa */}
       <div className="space-y-6">
         {/* Nombre de la empresa y Nombre Legal en el mismo row */}
-        <div className="border-b border-gray-200 pb-4">
+        <div className="border-b border-gray-200 pb-4 animate-in fade-in slide-in-from-left-2 duration-700 ease-out" style={{ animationDelay: '300ms' }}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-start gap-3">
-              <Building2 className="h-5 w-5 text-gray-600 mt-0.5" />
+              <Store className="h-5 w-5 text-gray-600 mt-0.5" />
               <div className="flex-1">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                   Nombre de la Empresa
@@ -209,7 +322,7 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <FileText className="h-5 w-5 text-gray-600 mt-0.5" />
+              <Scale className="h-5 w-5 text-gray-600 mt-0.5" />
               <div className="flex-1">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                   Nombre Legal / Razón Social
@@ -222,22 +335,11 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
           </div>
         </div>
 
-        {/* Dirección y País en el mismo row */}
-        <div className="border-b border-gray-200 pb-4">
+        {/* País y Dirección en el mismo row */}
+        <div className="border-b border-gray-200 pb-4 animate-in fade-in slide-in-from-left-2 duration-700 ease-out" style={{ animationDelay: '400ms' }}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-start gap-3">
-              <MapPin className="h-5 w-5 text-gray-600 mt-0.5" />
-              <div className="flex-1">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Dirección
-                </label>
-                <p className="text-base text-gray-900 mt-1">
-                  {company.address || <span className="text-gray-400 italic">No especificada</span>}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <MapPin className="h-5 w-5 text-gray-600 mt-0.5" />
+              <Flag className="h-5 w-5 text-gray-600 mt-0.5" />
               <div className="flex-1">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                   País
@@ -254,11 +356,22 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
                 </p>
               </div>
             </div>
+            <div className="flex items-start gap-3">
+              <MapPin className="h-5 w-5 text-gray-600 mt-0.5" />
+              <div className="flex-1">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  Dirección
+                </label>
+                <p className="text-base text-gray-900 mt-1">
+                  {company.address || <span className="text-gray-400 italic">No especificada</span>}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Sitio Web y Redes Sociales */}
-        <div className="border-b border-gray-200 pb-4">
+        <div className="border-b border-gray-200 pb-4 animate-in fade-in slide-in-from-left-2 duration-700 ease-out" style={{ animationDelay: '500ms' }}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Sitio Web */}
             <div className="flex items-start gap-3">
@@ -284,7 +397,7 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
 
             {/* Redes Sociales */}
             <div className="flex items-start gap-3">
-              <Share2 className="h-5 w-5 text-gray-600 mt-0.5" />
+              <Users className="h-5 w-5 text-gray-600 mt-0.5" />
               <div className="flex-1">
                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                   Redes Sociales
@@ -331,7 +444,7 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
       </div>
 
       {/* Pie de página del documento */}
-      <div className="mt-8 pt-4 border-t border-gray-300">
+      <div className="mt-8 pt-4 border-t border-gray-300 animate-in fade-in duration-700 ease-out" style={{ animationDelay: '600ms' }}>
         <p className="text-xs text-gray-500 text-center">
           Documento generado el {format(new Date(), "dd 'de' MMMM 'de' yyyy 'a las' HH:mm", { locale: es })}
         </p>

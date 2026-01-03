@@ -25,6 +25,7 @@ import { Pencil, Trash2, Building2, Plus } from "lucide-react"
 import Link from "next/link"
 import type { Company } from "@/lib/types/user"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 interface CompaniesTableProps {
   companies: Company[]
@@ -44,15 +45,16 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
       const data = await response.json()
 
       if (!response.ok) {
-        alert(data.error || "Error al eliminar la empresa")
+        toast.error(data.error || "Error al eliminar la empresa")
         return
       }
 
+      toast.success("Empresa eliminada correctamente")
       // Recargar la página para actualizar la lista
       router.refresh()
     } catch (error) {
       console.error("Error eliminando empresa:", error)
-      alert("Error inesperado al eliminar la empresa")
+      toast.error("Error inesperado al eliminar la empresa")
     } finally {
       setDeletingId(null)
     }

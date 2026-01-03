@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { X, Plus, Share2, Trash2, ExternalLink } from "lucide-react"
+import { X, Plus, Users, Trash2, ExternalLink } from "lucide-react"
 import {
   getAllSocialMediaConfigs,
   getSocialMediaConfig,
@@ -131,7 +131,7 @@ export function CompanySocialMediaForm({
               disabled={disabled || availableTypes.length === 0}
               className="h-9 gap-2"
             >
-              <Share2 className="h-4 w-4" />
+              <Users className="h-4 w-4" />
               <span>Agregar Red Social</span>
             </Button>
           )}

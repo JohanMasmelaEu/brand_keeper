@@ -180,24 +180,17 @@ export function AppSidebar({ userRole, userName, userEmail, companyName, avatarU
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
-        <div className="px-2 py-4 flex flex-col items-center gap-3">
-          <div className={`relative transition-all duration-500 ease-out ${isCollapsed ? "h-10 w-10" : "h-16 w-16"}`}>
+        <div className="px-2 py-1 flex flex-col items-center">
+          <div className="relative w-[76.5%] h-auto my-3 transition-all duration-500 ease-out">
             <Image
-              src="/images/LOGO_BRAND_KEEPER.png"
+              src="/images/LOGO_BRAND_KEEPER.gif"
               alt="Brand Keeper Logo"
-              width={isCollapsed ? 40 : 64}
-              height={isCollapsed ? 40 : 64}
-              className="object-contain transition-all duration-500 ease-out"
+              width={0}
+              height={0}
+              sizes="(max-width: 256px) 100vw, 256px"
+              className="w-full h-auto object-contain transition-all duration-500 ease-out"
+              unoptimized
             />
-          </div>
-          <div
-            className={`flex flex-col items-center transition-all duration-500 ease-out ${
-              isCollapsed && !isMobile ? "opacity-0 h-0 overflow-hidden max-h-0" : "opacity-100 max-h-20"
-            }`}
-          >
-            <span className="text-xl font-semibold font-sans" style={{ color: '#1b2c59' }}>
-              Brand keeper
-            </span>
           </div>
         </div>
       </SidebarHeader>

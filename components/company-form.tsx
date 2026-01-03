@@ -31,6 +31,7 @@ import { CompanySocialMediaForm } from "@/components/company-social-media-form"
 import { cn } from "@/lib/utils"
 import type { SocialMediaType } from "@/lib/types/social-media"
 import { Skeleton } from "@/components/ui/skeleton"
+import { toast } from "sonner"
 
 interface CompanyFormProps {
   company?: Company
@@ -136,7 +137,7 @@ export function CompanyForm({ company, mode, onFormReady, onFormChange }: Compan
       const result = await response.json()
 
       if (!response.ok) {
-        alert(result.error || `Error al ${mode === "create" ? "crear" : "actualizar"} la empresa`)
+        toast.error(result.error || `Error al ${mode === "create" ? "crear" : "actualizar"} la empresa`)
         setIsSubmitting(false)
         return
       }
@@ -163,13 +164,16 @@ export function CompanyForm({ company, mode, onFormReady, onFormChange }: Compan
           if (!socialMediaResponse.ok) {
             const errorData = await socialMediaResponse.json().catch(() => ({}))
             console.error("Error guardando redes sociales:", errorData)
-            alert(errorData.error || "Error al guardar las redes sociales. Por favor, inténtalo de nuevo.")
+            toast.error(errorData.error || "Error al guardar las redes sociales. Por favor, inténtalo de nuevo.")
           }
         } catch (error) {
           console.error("Error guardando redes sociales:", error)
-          alert("Error inesperado al guardar las redes sociales. Por favor, inténtalo de nuevo.")
+          toast.error("Error inesperado al guardar las redes sociales. Por favor, inténtalo de nuevo.")
         }
       }
+
+      // Mostrar mensaje de éxito
+      toast.success(mode === "create" ? "Empresa creada correctamente" : "Empresa actualizada correctamente")
 
       // Si es modo edición, esperar 2 segundos antes de redirigir para mostrar la animación de éxito
       if (mode === "edit") {
@@ -181,7 +185,7 @@ export function CompanyForm({ company, mode, onFormReady, onFormChange }: Compan
       router.refresh()
     } catch (error) {
       console.error(`Error ${mode === "create" ? "creando" : "actualizando"} empresa:`, error)
-      alert(`Error inesperado al ${mode === "create" ? "crear" : "actualizar"} la empresa`)
+      toast.error(`Error inesperado al ${mode === "create" ? "crear" : "actualizar"} la empresa`)
     } finally {
       setIsSubmitting(false)
     }

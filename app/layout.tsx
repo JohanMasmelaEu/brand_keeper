@@ -1,15 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Nunito } from "next/font/google";
+import { Overpass } from "next/font/google";
 import "./globals.css";
 import { DevBadge } from "@/components/dev-badge";
 import { DevReload } from "@/components/dev-reload";
 import { SpeedInsightsWrapper } from "@/components/speed-insights-wrapper";
+import { Toaster } from "@/components/ui/sonner";
 
-const nunito = Nunito({
+const overpass = Overpass({
   subsets: ["latin"],
-  weight: ["200", "300", "400", "500", "600", "700", "800", "900", "1000"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
   style: ["normal", "italic"],
-  variable: "--font-nunito",
+  variable: "--font-overpass",
   display: "swap",
 });
 
@@ -36,11 +37,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body suppressHydrationWarning className={`${nunito.variable} font-sans min-h-screen antialiased`}>
+      <body suppressHydrationWarning className={`${overpass.variable} font-sans min-h-screen antialiased`}>
         {children}
         <DevBadge />
         <DevReload />
         <SpeedInsightsWrapper />
+        <Toaster />
       </body>
     </html>
   );

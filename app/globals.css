@@ -10,11 +10,11 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    /* Color primario: Verde #95c345 */
-    --primary: 78 58% 52%;
+    /* Color primario: Verde lima #bcf352 */
+    --primary: 81 87% 64%;
     --primary-foreground: 0 0% 100%;
-    /* Color secundario: Azul #1b2c59 */
-    --secondary: 220 54% 23%;
+    /* Color secundario: Gris oscuro #212726 */
+    --secondary: 170 8% 14%;
     --secondary-foreground: 0 0% 100%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
@@ -24,8 +24,8 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    /* Ring usa el color primario (verde) para los contornos de focus */
-    --ring: 78 58% 52%;
+    /* Ring usa el color primario (verde lima) para los contornos de focus */
+    --ring: 81 87% 64%;
     --radius: 0.5rem;
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -44,11 +44,11 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    /* Color primario: Verde #95c345 (mismo en dark mode) */
-    --primary: 78 58% 52%;
+    /* Color primario: Verde lima #bcf352 (mismo en dark mode) */
+    --primary: 81 87% 64%;
     --primary-foreground: 0 0% 100%;
-    /* Color secundario: Azul #1b2c59 (mismo en dark mode) */
-    --secondary: 220 54% 23%;
+    /* Color secundario: Gris oscuro #212726 (mismo en dark mode) */
+    --secondary: 170 8% 14%;
     --secondary-foreground: 0 0% 100%;
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
@@ -58,8 +58,8 @@
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    /* Ring usa el color primario (verde) para los contornos de focus */
-    --ring: 78 58% 52%;
+    /* Ring usa el color primario (verde lima) para los contornos de focus */
+    --ring: 81 87% 64%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;

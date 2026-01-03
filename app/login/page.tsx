@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"
-import Iridescence from "@/components/animations/iridescent-background"
+import Beams from "@/components/animations/beams"
 import Image from "next/image"
 import { LogIn } from "lucide-react"
 import { useFormValidation } from "@/lib/hooks/use-form-validation"
@@ -31,21 +31,27 @@ import { PageLoader } from "@/components/ui/page-loader"
 // Componente separado y memoizado para la animación para evitar re-renderizados
 const AnimationSection = memo(function AnimationSection() {
   return (
-    <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-      <Iridescence
-        color={[0, 1, 0.8]}
-        speed={1.7}
-        amplitude={0.1}
-        mouseReact={true}
-      />
+    <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-background">
+      <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+        <Beams
+          beamWidth={2}
+          beamHeight={15}
+          beamNumber={12}
+          lightColor="#ffffff"
+          speed={2}
+          noiseIntensity={1.75}
+          scale={0.2}
+          rotation={0}
+        />
+      </div>
       {/* Logo Samtel centrado */}
       <div className="absolute inset-0 flex items-center justify-center z-10">
-        <div className="relative w-full max-w-md px-8">
+        <div className="relative w-full max-w-2xl px-8">
           <Image
             src="/images/LOGO_CORE_LOGIN.png"
             alt="Samtel Logo"
-            width={400}
-            height={200}
+            width={600}
+            height={300}
             className="w-full h-auto object-contain"
             priority
           />
@@ -59,6 +65,7 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isPageLoading, setIsPageLoading] = useState(true)
+  const [isLoginLoading, setIsLoginLoading] = useState(false)
 
   // Detectar cuando todos los elementos están cargados
   useEffect(() => {
@@ -90,6 +97,9 @@ function LoginForm() {
       password: "",
     },
     onSubmit: async (data) => {
+      // Mostrar el loader inmediatamente al presionar el botón
+      setIsLoginLoading(true)
+
       const supabase = createClient()
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email: data.email,
@@ -97,10 +107,12 @@ function LoginForm() {
       })
 
       if (signInError) {
+        setIsLoginLoading(false)
         throw new Error(signInError.message)
       }
 
       if (!signInData.user) {
+        setIsLoginLoading(false)
         throw new Error("No se pudo iniciar sesión. Por favor, intenta nuevamente.")
       }
 
@@ -117,6 +129,7 @@ function LoginForm() {
               }, 200)
             } else if (event === 'SIGNED_OUT') {
               subscription.unsubscribe()
+              setIsLoginLoading(false)
               reject(new Error('Sesión no establecida'))
             }
           }
@@ -130,17 +143,35 @@ function LoginForm() {
             if (session) {
               resolve()
             } else {
+              setIsLoginLoading(false)
               reject(new Error('Timeout esperando sesión'))
             }
           })
         }, 2000)
       })
 
+      // Marcar en sessionStorage que el login fue exitoso para que el dashboard muestre el loader
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("login_success", "true")
+        // Limpiar el flag de dashboard cargado para forzar el loader
+        sessionStorage.removeItem("dashboard_loaded")
+      }
+
+      // Mantener el loader visible durante la transición
+      // El loader del login permanecerá visible hasta que se recargue la página
+      // El DashboardLoader tomará el control inmediatamente cuando detecte el flag
       // Forzar una recarga completa para que el middleware detecte la sesión
       // El middleware se encargará de redirigir al dashboard correcto
       window.location.href = "/"
     },
   })
+
+  // Ocultar el loader de login si hay error y ya no se está enviando
+  useEffect(() => {
+    if (error && !isSubmitting) {
+      setIsLoginLoading(false)
+    }
+  }, [error, isSubmitting])
 
   // Verificar si hay un error en los query params (del callback)
   useEffect(() => {
@@ -152,18 +183,18 @@ function LoginForm() {
 
   return (
     <>
-      <PageLoader isLoading={isPageLoading} />
+      <PageLoader isLoading={isPageLoading || isLoginLoading} />
       {/* Lado derecho - Formulario */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-background">
         <Card className="w-full max-w-lg border-0">
           {/* Logo visible solo en móvil - dentro del Card al inicio */}
           <div className="lg:hidden w-full flex justify-center pt-6 pb-4 px-6">
-            <div className="relative w-full max-w-[280px] sm:max-w-[320px] aspect-[2/1]">
+            <div className="relative w-full max-w-[360px] sm:max-w-[420px] aspect-[2/1]">
               <Image
                 src="/images/LOGO_CORE_LOGIN.png"
                 alt="Samtel Logo"
-                width={350}
-                height={175}
+                width={450}
+                height={225}
                 className="w-full h-full object-contain"
                 priority
               />
@@ -229,7 +260,7 @@ function LoginForm() {
                   className="w-full h-12 sm:h-14 text-lg sm:text-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary" 
                   style={{ 
                     backgroundColor: 'hsl(var(--primary))', 
-                    color: 'white',
+                    color: 'hsl(var(--secondary))',
                   }}
                   disabled={isSubmitting}
                 >

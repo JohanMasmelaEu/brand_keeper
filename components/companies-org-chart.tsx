@@ -6,7 +6,6 @@ import type { Company } from "@/lib/types/user"
 import { Building2 } from "lucide-react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
 import { Pencil, Trash2, ZoomIn, ZoomOut } from "lucide-react"
 import Link from "next/link"
 import {
@@ -22,6 +21,20 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useRouter } from "next/navigation"
 import { useSidebar } from "@/components/ui/sidebar"
+import { toast } from "sonner"
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import { CompanyDocumentView } from "@/components/company-document-view"
 
 interface CompaniesOrgChartProps {
   companies: Company[]
@@ -52,14 +65,15 @@ export function CompaniesOrgChart({ companies }: CompaniesOrgChartProps) {
       const data = await response.json()
 
       if (!response.ok) {
-        alert(data.error || "Error al eliminar la empresa")
+        toast.error(data.error || "Error al eliminar la empresa")
         return
       }
 
+      toast.success("Empresa eliminada correctamente")
       router.refresh()
     } catch (error) {
       console.error("Error eliminando empresa:", error)
-      alert("Error inesperado al eliminar la empresa")
+      toast.error("Error inesperado al eliminar la empresa")
     } finally {
       setDeletingId(null)
     }
@@ -98,6 +112,7 @@ export function CompaniesOrgChart({ companies }: CompaniesOrgChartProps) {
     )
   }
 
+
   // Componente para renderizar la tarjeta de empresa
   const CompanyCard = ({ 
     node, 
@@ -107,110 +122,108 @@ export function CompaniesOrgChart({ companies }: CompaniesOrgChartProps) {
     isParent?: boolean 
   }) => {
     if (isParent) {
-      // Empresa madre en forma circular (más pequeña)
+      // Empresa madre en forma circular
       return (
-        <Card
-          className="w-48 h-48 rounded-full transition-all shadow-2xl hover:shadow-2xl flex flex-col items-center justify-center border-primary border-2 bg-white relative"
-          style={{ position: 'relative', zIndex: 10 }}
-        >
-          {/* Header con logo */}
-          <CardHeader className="p-3 pb-1 flex-1 flex items-center justify-center">
-            <div className="w-24 h-24 flex items-center justify-center bg-muted/30 rounded-full overflow-hidden">
-              {node.company.logo_url ? (
-                <Image
-                  src={node.company.logo_url}
-                  alt={`Logo de ${node.name}`}
-                  width={96}
-                  height={96}
-                  className="w-full h-full object-contain p-2"
-                  unoptimized={node.company.logo_url.startsWith("http")}
-                />
-              ) : (
-                <div className="flex items-center justify-center w-full h-full">
-                  <Building2
-                    className="h-12 w-12 text-primary"
-                  />
+        <Dialog>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DialogTrigger asChild>
+                <Card
+                    className="w-72 h-72 rounded-full transition-all shadow-2xl hover:shadow-2xl flex flex-col items-center justify-center border-primary border-[3px] bg-white relative cursor-pointer overflow-hidden"
+                    style={{ position: 'relative', zIndex: 10 }}
+                  >
+              {/* Logo centrado - más grande */}
+              <div className="flex-1 flex items-center justify-center pt-6 pb-2">
+                <div className="w-48 h-48 flex items-center justify-center bg-muted/20 rounded-full overflow-hidden shrink-0">
+                  {node.company.logo_url ? (
+                    <Image
+                      src={node.company.logo_url}
+                      alt={`Logo de ${node.name}`}
+                      width={192}
+                      height={192}
+                      className="w-full h-full object-contain p-5"
+                      unoptimized={node.company.logo_url.startsWith("http")}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center w-full h-full">
+                      <Building2
+                        className="h-24 w-24 text-primary"
+                      />
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </CardHeader>
+              </div>
 
-          {/* Contenido centrado */}
-          <CardContent className="p-2 pt-0 flex-1 flex flex-col items-center justify-center text-center space-y-1">
-            <h3 className="font-semibold text-xs text-primary">
-              {node.name}
-            </h3>
-            {node.company.legal_name && (
-              <p className="text-[10px] text-muted-foreground">
-                {node.company.legal_name}
-              </p>
-            )}
-            <span className="inline-flex items-center rounded-full bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
-              Matriz
-            </span>
-            <div className="flex items-center gap-1 pt-1">
-              <Link href={`/dashboard/companies/${node.company.id}/edit`}>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                  <Pencil className="h-3 w-3" />
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+              {/* Nombre y acciones en la parte inferior */}
+              <div className="flex flex-col items-center gap-1.5 pb-3 px-4 flex-shrink-0">
+                <h3 className="font-semibold text-xs text-primary text-center line-clamp-2 leading-tight">
+                  {node.name}
+                </h3>
+                <div className="flex items-center gap-1">
+                  <Link href={`/dashboard/companies/${node.company.id}/edit`} onClick={(e) => e.stopPropagation()}>
+                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0 rounded-full hover:bg-primary/10">
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </Card>
+                </DialogTrigger>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{node.name}</p>
+              </TooltipContent>
+            </Tooltip>
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 bg-transparent border-0 shadow-none [&>button]:bg-background/90 [&>button]:backdrop-blur-sm [&>button]:border [&>button]:rounded-full [&>button]:hover:bg-background">
+              <DialogTitle className="sr-only">Detalles de {node.name}</DialogTitle>
+              <CompanyDocumentView company={node.company} />
+            </DialogContent>
+          </Dialog>
       )
     }
 
     // Empresas hijas en forma rectangular
     return (
-      <Card
-        className="w-64 min-w-[256px] transition-all shadow-2xl hover:shadow-2xl border-border bg-card relative"
-        style={{ position: 'relative' }}
-      >
-          {/* Header con logo */}
+      <Dialog>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DialogTrigger asChild>
+              <Card
+                  className="w-64 min-w-[256px] transition-all shadow-2xl hover:shadow-2xl border-border bg-card relative cursor-pointer"
+                  style={{ position: 'relative' }}
+                >
+          {/* Logo */}
           <CardHeader className="p-4 pb-2">
-            <div className="w-full h-24 flex items-center justify-center bg-muted/30 rounded-md overflow-hidden">
+            <div className="w-full h-32 flex items-center justify-center bg-muted/30 rounded-md overflow-hidden">
               {node.company.logo_url ? (
                 <Image
                   src={node.company.logo_url}
                   alt={`Logo de ${node.name}`}
                   width={200}
-                  height={96}
+                  height={128}
                   className="w-full h-full object-contain p-2"
                   unoptimized={node.company.logo_url.startsWith("http")}
                 />
               ) : (
                 <div className="flex items-center justify-center w-full h-full">
                   <Building2
-                    className="h-12 w-12 text-muted-foreground"
+                    className="h-16 w-16 text-muted-foreground"
                   />
                 </div>
               )}
             </div>
           </CardHeader>
 
-          {/* Separador entre header y contenido */}
-          <Separator />
-
+          {/* Nombre y acciones */}
           <CardContent className="p-4 pt-2">
-            <div className="flex flex-col items-center text-center space-y-2">
-              <h3 className="font-semibold text-sm text-foreground">
+            <div className="flex flex-col items-center gap-3">
+              <h3 className="font-semibold text-sm text-foreground text-center line-clamp-2">
                 {node.name}
               </h3>
-
-              {node.company.legal_name && (
-                <p className="text-xs text-muted-foreground">
-                  {node.company.legal_name}
-                </p>
-              )}
-
-              <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs font-medium">
-                Hija
-              </span>
-
-              <div className="flex items-center gap-1 pt-2 border-t w-full justify-center">
-                <Link href={`/dashboard/companies/${node.company.id}/edit`}>
+              <div className="flex items-center gap-1">
+                <Link href={`/dashboard/companies/${node.company.id}/edit`} onClick={(e) => e.stopPropagation()}>
                   <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <Pencil className="h-3.5 w-3.5" />
+                    <Pencil className="h-4 w-4" />
                   </Button>
                 </Link>
                 <AlertDialog>
@@ -220,8 +233,9 @@ export function CompaniesOrgChart({ companies }: CompaniesOrgChartProps) {
                       size="sm"
                       className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                       disabled={deletingId === node.company.id}
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      <Trash2 className="h-3.5 w-3.5" />
+                      <Trash2 className="h-4 w-4" />
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
@@ -249,6 +263,17 @@ export function CompaniesOrgChart({ companies }: CompaniesOrgChartProps) {
             </div>
           </CardContent>
         </Card>
+              </DialogTrigger>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{node.name}</p>
+            </TooltipContent>
+          </Tooltip>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 bg-transparent border-0 shadow-none [&>button]:bg-background/90 [&>button]:backdrop-blur-sm [&>button]:border [&>button]:rounded-full [&>button]:hover:bg-background">
+            <DialogTitle className="sr-only">Detalles de {node.name}</DialogTitle>
+            <CompanyDocumentView company={node.company} />
+          </DialogContent>
+        </Dialog>
     )
   }
 
@@ -257,14 +282,17 @@ export function CompaniesOrgChart({ companies }: CompaniesOrgChartProps) {
     const containerRef = React.useRef<HTMLDivElement>(null)
     const parentCardRef = React.useRef<HTMLDivElement>(null)
     const [connectorPaths, setConnectorPaths] = React.useState<string[]>([])
+    const [svgViewBox, setSvgViewBox] = React.useState("0 0 1000 1000")
     const [zoom, setZoom] = React.useState(1)
     const [isDragging, setIsDragging] = React.useState(false)
     const [dragStart, setDragStart] = React.useState({ x: 0, y: 0 })
     const [dragOffset, setDragOffset] = React.useState({ x: 0, y: 0 })
     const dragStartRef = React.useRef({ x: 0, y: 0 })
     const dragOffsetRef = React.useRef({ x: 0, y: 0 })
+    const initialZoomRef = React.useRef(1)
     const hasChildren = node.children && node.children.length > 0
     const { state: sidebarState } = useSidebar()
+    const [isInitialized, setIsInitialized] = React.useState(false)
 
     // Sincronizar refs con state
     React.useEffect(() => {
@@ -282,7 +310,7 @@ export function CompaniesOrgChart({ companies }: CompaniesOrgChartProps) {
     }
 
     const handleZoomReset = () => {
-      setZoom(1)
+      setZoom(initialZoomRef.current)
       setDragOffset({ x: 0, y: 0 })
     }
 
@@ -381,11 +409,12 @@ export function CompaniesOrgChart({ companies }: CompaniesOrgChartProps) {
         const container = containerRef.current
         if (!container) return
 
-        // Usar las dimensiones del contenedor directamente
-        // El SVG está dentro del contenedor transformado, así que las coordenadas
-        // deben estar en el espacio del contenedor antes del transform
+        // Usar las dimensiones del contenedor principal
         const containerWidth = container.offsetWidth || container.clientWidth
         const containerHeight = container.offsetHeight || container.clientHeight
+        
+        // Actualizar el viewBox del SVG para que coincida con las dimensiones del contenedor
+        setSvgViewBox(`0 0 ${containerWidth} ${containerHeight}`)
         
         const paths: string[] = []
 
@@ -405,14 +434,11 @@ export function CompaniesOrgChart({ companies }: CompaniesOrgChartProps) {
           const y = Math.sin(angle) * radius
           
           // Posición del centro del hijo en el espacio del contenedor
-          // Estas coordenadas son relativas al contenedor, y el SVG las transformará
-          // automáticamente junto con el contenido
           const childCenterX = centerX + x
           const childCenterY = centerY + y
           
           // Línea recta directa desde el centro de la hija hacia el centro del contenedor
           // Todas las líneas convergen en el mismo punto (centerX, centerY)
-          // que coincide con el centro visual de la empresa matriz
           paths.push(
             `M ${childCenterX} ${childCenterY} L ${centerX} ${centerY}`
           )
@@ -459,6 +485,75 @@ export function CompaniesOrgChart({ companies }: CompaniesOrgChartProps) {
       }
     }, [recalculatePaths])
 
+    // Calcular y ajustar zoom inicial para que el organigrama se vea completo
+    React.useEffect(() => {
+      if (!containerRef.current || isInitialized) return
+
+      // Esperar a que el DOM se renderice completamente
+      const timer = setTimeout(() => {
+        if (!containerRef.current) return
+
+        const container = containerRef.current
+        const containerWidth = container.offsetWidth || container.clientWidth
+        const containerHeight = container.offsetHeight || container.clientHeight
+
+        // Tamaños de las tarjetas (en píxeles)
+        const parentCardSize = 288 // w-72 h-72 = 18rem = 288px
+        const childCardWidth = 256 // w-64 = 16rem = 256px
+        const childCardHeight = 280 // altura más conservadora para las tarjetas hijas
+        const radius = 400 // radio de distribución de las empresas hijas
+        const padding = 150 // padding adicional aumentado para evitar cortes
+
+        // Calcular el bounding box del contenido completo
+        // El contenido está centrado, así que calculamos desde el centro hacia los bordes
+        let maxDistanceX = parentCardSize / 2
+        let maxDistanceY = parentCardSize / 2
+
+        if (hasChildren && node.children) {
+          // Calcular las posiciones de todas las tarjetas hijas
+          node.children.forEach((_, index) => {
+            const total = node.children!.length
+            const startAngle = -Math.PI / 2
+            const angle = startAngle + (index * 2 * Math.PI) / total
+            
+            // Posición del centro de la tarjeta hija
+            const childX = Math.cos(angle) * radius
+            const childY = Math.sin(angle) * radius
+            
+            // Calcular la distancia desde el centro hasta el borde más lejano de esta tarjeta
+            const distanceX = Math.abs(childX) + childCardWidth / 2
+            const distanceY = Math.abs(childY) + childCardHeight / 2
+            
+            maxDistanceX = Math.max(maxDistanceX, distanceX)
+            maxDistanceY = Math.max(maxDistanceY, distanceY)
+          })
+        }
+
+        // El tamaño total es el doble de la distancia máxima desde el centro
+        const totalWidth = (maxDistanceX + padding) * 2
+        const totalHeight = (maxDistanceY + padding) * 2
+
+        // Calcular el zoom necesario para que quepa en el viewport
+        // Usar el área visible real del contenedor (considerando padding del contenedor)
+        const availableWidth = containerWidth - 32 // padding lateral
+        const availableHeight = containerHeight - 32 // padding vertical
+        
+        const zoomX = availableWidth / totalWidth
+        const zoomY = availableHeight / totalHeight
+        const calculatedZoom = Math.min(zoomX, zoomY, 1) // No hacer zoom in, solo out
+
+        // Aplicar el zoom con un margen más conservador (85% del calculado para más espacio)
+        const finalZoom = Math.max(calculatedZoom * 0.85, 0.25) // Mínimo 25% de zoom
+
+        initialZoomRef.current = finalZoom
+        setZoom(finalZoom)
+        setDragOffset({ x: 0, y: 0 })
+        setIsInitialized(true)
+      }, 150) // Aumentar el delay para asegurar que todo esté renderizado
+
+      return () => clearTimeout(timer)
+    }, [hasChildren, node.children, isInitialized])
+
     // Calcular posiciones radiales para las empresas hijas
     const getChildPosition = (index: number, total: number) => {
       if (total === 0) return { top: 0, left: 0 }
@@ -483,7 +578,7 @@ export function CompaniesOrgChart({ companies }: CompaniesOrgChartProps) {
     return (
       <div 
         ref={containerRef}
-        className="relative w-full min-h-[900px] flex items-center justify-center py-8 overflow-hidden touch-none"
+        className="relative w-full h-full min-h-[800px] flex items-center justify-center overflow-hidden touch-none"
         style={{ 
           position: 'relative',
           cursor: isDragging ? 'grabbing' : 'grab',
@@ -502,7 +597,9 @@ export function CompaniesOrgChart({ companies }: CompaniesOrgChartProps) {
           style={{
             transform: `translate(${dragOffset.x}px, ${dragOffset.y}px) scale(${zoom})`,
             transformOrigin: 'center center',
-            transition: isDragging ? 'none' : 'transform 0.2s ease-in-out'
+            transition: isDragging ? 'none' : 'transform 0.2s ease-in-out',
+            minWidth: '100%',
+            minHeight: '100%'
           }}
         >
           {/* Fondo de grilla de puntos dentro del contenedor arrastrable */}
@@ -520,30 +617,32 @@ export function CompaniesOrgChart({ companies }: CompaniesOrgChartProps) {
               opacity: 0.5
             }}
           />
-          {/* Capa de fondo: SVG para las líneas de conexión */}
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0 }}>
+          
+          {/* Capa de fondo: SVG para las líneas de conexión - dentro del contenedor transformado */}
           {connectorPaths.length > 0 && (
             <svg
-              className="absolute top-0 left-0 w-full h-full pointer-events-none"
+              className="absolute inset-0 pointer-events-none"
               style={{ 
-                height: "100%",
                 width: "100%",
-                overflow: "visible"
+                height: "100%",
+                zIndex: 0
               }}
+              viewBox={svgViewBox}
+              preserveAspectRatio="none"
             >
               {connectorPaths.map((path, index) => (
                 <path
                   key={`connector-${node.children![index].id}`}
                   d={path}
-                  stroke="hsl(var(--secondary))"
+                  stroke="hsl(var(--border))"
                   strokeWidth="2.5"
-                  strokeDasharray="12 12"
+                  strokeDasharray="8 8"
                   fill="none"
-                  opacity="0.85"
+                  opacity="0.7"
                 >
                   <animate
                     attributeName="stroke-dashoffset"
-                    values="0;24"
+                    values="0;16"
                     dur="2s"
                     repeatCount="indefinite"
                   />
@@ -551,40 +650,39 @@ export function CompaniesOrgChart({ companies }: CompaniesOrgChartProps) {
               ))}
             </svg>
           )}
-        </div>
 
-        {/* Capa superior: Empresa madre en el centro */}
-        {/* El punto de referencia es el centro (50%, 50%) del contenedor */}
-        {/* La tarjeta se posiciona con transform: translate(-50%, -50%) para centrarla */}
-        {/* Esto asegura que el centro visual de la tarjeta coincida exactamente con el punto de convergencia de las líneas */}
-        <div 
-          ref={parentCardRef}
-          className="relative"
-          style={{ 
-            position: 'absolute', 
-            top: '50%', 
-            left: '50%', 
-            transform: 'translate(-50%, -50%)',
-            zIndex: 10
-          }}
-        >
-          <CompanyCard node={node} isParent={true} />
-        </div>
-
-        {/* Capa superior: Empresas hijas distribuidas alrededor */}
-        {hasChildren && node.children!.map((child, index) => (
-          <div
-            key={child.id}
-            data-child-node
-            className="absolute"
-            style={{
-              ...getChildPosition(index, node.children!.length),
-              zIndex: 1
+          {/* Capa superior: Empresa madre en el centro */}
+          {/* El punto de referencia es el centro (50%, 50%) del contenedor */}
+          {/* La tarjeta se posiciona con transform: translate(-50%, -50%) para centrarla */}
+          {/* Esto asegura que el centro visual de la tarjeta coincida exactamente con el punto de convergencia de las líneas */}
+          <div 
+            ref={parentCardRef}
+            className="relative"
+            style={{ 
+              position: 'absolute', 
+              top: '50%', 
+              left: '50%', 
+              transform: 'translate(-50%, -50%)',
+              zIndex: 2
             }}
           >
-            <CompanyCard node={child} isParent={false} />
+            <CompanyCard node={node} isParent={true} />
           </div>
-        ))}
+
+          {/* Capa superior: Empresas hijas distribuidas alrededor */}
+          {hasChildren && node.children!.map((child, index) => (
+            <div
+              key={child.id}
+              data-child-node
+              className="absolute"
+              style={{
+                ...getChildPosition(index, node.children!.length),
+                zIndex: 2
+              }}
+            >
+              <CompanyCard node={child} isParent={false} />
+            </div>
+          ))}
         </div>
 
         {/* Control de zoom en la parte superior derecha */}
@@ -624,11 +722,13 @@ export function CompaniesOrgChart({ companies }: CompaniesOrgChartProps) {
   }
 
   return (
-    <div className="w-full overflow-x-auto py-8">
-      <div className="flex justify-center min-w-max">
-        <RadialOrgChart node={orgStructure} />
+    <TooltipProvider>
+      <div className="w-full overflow-x-auto py-8">
+        <div className="flex justify-center min-w-max">
+          <RadialOrgChart node={orgStructure} />
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   )
 }
 
