@@ -46,8 +46,9 @@ export function UsersView({ users, companies }: UsersViewProps) {
   }, [companies, selectedCompanyId])
 
   return (
-    <div className="w-full">
-      <div className="mb-6 sm:mb-8">
+    <div className="w-full h-full flex flex-col min-h-0">
+      {/* Header fijo */}
+      <div className="flex-shrink-0 mb-6 sm:mb-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 items-center gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 break-words">
@@ -69,7 +70,7 @@ export function UsersView({ users, companies }: UsersViewProps) {
       </div>
 
       {/* Select de empresas - centrado horizontalmente */}
-      <div className="mb-6 flex justify-center">
+      <div className="flex-shrink-0 mb-6 flex justify-center">
         <div className="w-full max-w-md">
           <Select
             value={selectedCompanyId}
@@ -92,7 +93,7 @@ export function UsersView({ users, companies }: UsersViewProps) {
 
       {/* Logo de la empresa seleccionada */}
       {selectedCompany && (
-        <div className="mb-6 flex justify-center">
+        <div className="flex-shrink-0 mb-6 flex justify-center">
           <div className="h-20 min-h-20 flex items-center justify-center">
             {selectedCompany.logo_url ? (
               <Image
@@ -118,11 +119,11 @@ export function UsersView({ users, companies }: UsersViewProps) {
         </div>
       )}
 
-      {/* Card con tabla de usuarios */}
-      <div suppressHydrationWarning>
-        <Card className="w-full shadow-lg">
-          <CardContent className="p-6">
-            <UsersTable users={filteredUsers} />
+      {/* Card con tabla de usuarios - ocupa el espacio restante */}
+      <div suppressHydrationWarning className="flex-1 min-h-0 flex flex-col">
+        <Card className="w-full shadow-lg flex-1 flex flex-col min-h-0 overflow-hidden">
+          <CardContent className="p-6 flex-1 flex flex-col min-h-0 overflow-hidden">
+            <UsersTable users={filteredUsers} companies={companies} />
           </CardContent>
         </Card>
       </div>

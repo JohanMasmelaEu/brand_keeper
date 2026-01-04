@@ -295,7 +295,22 @@ export function UserForm({ user, companies, mode, onFormReady, onFormChange }: U
         return
       }
 
-      toast.success(`Usuario ${mode === "create" ? "creado" : "actualizado"} correctamente`)
+      // Manejar el resultado de la creación de usuario
+      if (mode === "create") {
+        if (result.emailSent) {
+          toast.success(result.message || "Usuario creado correctamente. Se ha enviado un correo con las credenciales de acceso.")
+        } else {
+          // Si el correo no se envió, mostrar advertencia con la contraseña
+          toast.warning("Usuario creado correctamente, pero no se pudo enviar el correo.", {
+            description: result.password 
+              ? `Contraseña: ${result.password} - ${result.emailError || "Error desconocido"}`
+              : result.emailError || "Error desconocido al enviar correo",
+            duration: 10000, // Mostrar por más tiempo para que el usuario pueda copiar la contraseña
+          })
+        }
+      } else {
+        toast.success("Usuario actualizado correctamente")
+      }
 
       // Si es modo edición, esperar 2 segundos antes de redirigir para mostrar la animación de éxito
       if (mode === "edit") {

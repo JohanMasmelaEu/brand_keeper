@@ -63,9 +63,9 @@ export default async function DashboardLayout({
             <Separator orientation="vertical" className="h-6" />
             <div className="flex-1" />
           </header>
-          <div className="flex flex-1 flex-col gap-4">
+          <div className="flex flex-1 flex-col gap-4 min-h-0 overflow-hidden">
             <DashboardTransitionWrapper>
-              <div className="dashboard-module-content">
+              <div className="dashboard-module-content flex-1 min-h-0">
                 {children}
               </div>
             </DashboardTransitionWrapper>

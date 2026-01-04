@@ -142,23 +142,40 @@ export async function POST(request: NextRequest) {
     const newUser = result.user
 
     // Enviar correo de bienvenida con la contraseña
+    let emailSent = false
+    let emailError: string | null = null
+    
     try {
       await sendWelcomeEmail(
         data.email,
         password,
         data.full_name || undefined
       )
-    } catch (emailError) {
+      emailSent = true
+    } catch (error) {
       // Log del error pero no fallar la creación del usuario
-      console.error("Error enviando correo de bienvenida:", emailError)
+      const errorMessage = error instanceof Error ? error.message : "Error desconocido"
+      console.error("Error enviando correo de bienvenida:", error)
+      emailError = errorMessage
       // El usuario ya fue creado, así que continuamos
+    }
+
+    // Construir mensaje según si el correo se envió o no
+    let message = "Usuario creado correctamente."
+    if (emailSent) {
+      message += " Se ha enviado un correo con las credenciales de acceso."
+    } else {
+      message += ` ⚠️ No se pudo enviar el correo: ${emailError || "Error desconocido"}. La contraseña es: ${password}`
     }
 
     return NextResponse.json(
       {
         success: true,
-        message: "Usuario creado correctamente. Se ha enviado un correo con las credenciales de acceso.",
+        message,
         user: newUser,
+        emailSent,
+        ...(emailError && { emailError }),
+        ...(!emailSent && { password }), // Incluir contraseña si no se envió el correo
       },
       { status: 201 }
     )

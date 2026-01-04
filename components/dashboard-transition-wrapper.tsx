@@ -81,7 +81,7 @@ export function DashboardTransitionWrapper({
   }, [pathname, children])
 
   return (
-    <div className="relative w-full min-h-[400px]">
+    <div className="relative w-full h-full flex-1 min-h-0 flex flex-col">
       {/* Skeleton durante la transición */}
       {isTransitioning && (
         <div className="absolute inset-0 z-10 animate-in-module">
@@ -91,7 +91,7 @@ export function DashboardTransitionWrapper({
 
       {/* Contenido principal con fade in/out */}
       <div
-        className={`w-full ${
+        className={`w-full h-full flex-1 min-h-0 flex flex-col ${
           showContent 
             ? "opacity-100 translate-y-0" 
             : "opacity-0 translate-y-1"

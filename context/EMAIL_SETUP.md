@@ -42,22 +42,29 @@ Un **servicio de correo** es una plataforma externa que se encarga de enviar cor
    - Crea una nueva API Key
    - Cópiala (solo se muestra una vez)
 
-3. **Verificar dominio (opcional pero recomendado):**
-   - Para usar tu propio dominio (ej: `noreply@tudominio.com`)
-   - Ve a "Domains" en Resend
-   - Agrega tu dominio y sigue las instrucciones para verificar
+3. **Verificar dominio (OBLIGATORIO para producción):**
+   - ⚠️ **IMPORTANTE**: El dominio de prueba `onboarding@resend.dev` solo permite enviar correos a tu propia dirección de email
+   - Para enviar correos a cualquier destinatario, **debes verificar un dominio**
+   - Ve a https://resend.com/domains
+   - Agrega tu dominio (ej: `samtel.eu`)
+   - Sigue las instrucciones para verificar el dominio (agregar registros DNS)
+   - Una vez verificado, podrás usar ese dominio en `RESEND_FROM_EMAIL`
 
 4. **Configurar variables de entorno:**
    - Abre tu archivo `.env.local`
    - Agrega:
      ```env
      RESEND_API_KEY=re_xxxxxxxxxxxxx
+     ```
+   - **Si tienes dominio verificado:**
+     ```env
      RESEND_FROM_EMAIL=Brand Keeper <noreply@tudominio.com>
      ```
-   - O si no tienes dominio verificado, usa el dominio de prueba de Resend:
+   - **Si NO tienes dominio verificado (solo para pruebas):**
      ```env
      RESEND_FROM_EMAIL=Brand Keeper <onboarding@resend.dev>
      ```
+     ⚠️ **Limitación**: Solo podrás enviar correos a tu propia dirección de email registrada en Resend
 
 5. **Instalar el paquete:**
    ```powershell
@@ -97,4 +104,5 @@ Si no recibes el correo:
 - Revisa la carpeta de spam
 - Verifica que `RESEND_API_KEY` esté correctamente configurado
 - Revisa los logs del servidor para ver errores
+- **Si usas el dominio de prueba**: Solo puedes enviar a tu propia dirección de email. Para enviar a otros, verifica un dominio en Resend
 
