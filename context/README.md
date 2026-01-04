@@ -25,6 +25,10 @@ Los archivos en esta carpeta proporcionan contexto detallado sobre aspectos espe
   - Integración entre ambas plataformas
   - Configuración de seguridad
   - Estado actual del proyecto
+  - Módulos implementados:
+    - ✅ Gestión de Perfil de Usuario
+    - ✅ Gestión de Empresas
+    - ✅ Gestión de Usuarios
 
 ### Configuración y Setup
 

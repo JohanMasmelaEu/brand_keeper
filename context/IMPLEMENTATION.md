@@ -864,7 +864,310 @@ Durante la configuración inicial, se resolvieron los siguientes problemas:
 
 ---
 
+### Gestión de Usuarios ✅ COMPLETADO
+
+**Estado**: Implementado y Funcionando - Diciembre 2024
+
+#### Páginas y Rutas
+
+- ✅ **Listado de Usuarios** (`/dashboard/users`)
+  - Página principal con tabla de todos los usuarios
+  - Filtros avanzados: por nombre, email, rol, empresa, estado
+  - Búsqueda en tiempo real
+  - Ordenamiento por columnas (nombre, email, rol, empresa, fecha de creación)
+  - Paginación configurable (5, 10, 20, 50, 100 usuarios por página)
+  - Vista de documento de usuario (modal)
+  - Acceso restringido a Super Admin
+  - Componente: `UsersView` con `UsersTable`
+
+- ✅ **Crear Usuario** (`/dashboard/companies/new`)
+  - Formulario completo para crear nuevo usuario
+  - Validación en tiempo real
+  - Generación automática de contraseña
+  - Envío automático de correo de bienvenida
+  - Componente: `UserForm` con modo `create`
+
+- ✅ **Editar Usuario** (`/dashboard/users/[id]/edit`)
+  - Formulario para editar información de usuario
+  - Carga datos existentes del usuario
+  - Cambio de contraseña opcional
+  - Activación/desactivación de usuario
+  - Validación de permisos (solo Super Admin)
+  - Componente: `UserEditClient` con `UserForm` en modo `edit`
+
+#### Componentes Implementados
+
+- ✅ **`UserForm`** (`components/user-form.tsx`)
+  - Formulario reutilizable para crear/editar usuarios
+  - Campos: email, nombre completo, rol, empresa, estado activo
+  - Subida y recorte de avatar (reutiliza `ImageCropper`)
+  - Cambio de contraseña (solo en modo edición)
+  - Validación con React Hook Form y Zod
+  - Vista previa de documento en tiempo real
+  - Manejo de estados de carga y errores
+
+- ✅ **`UserFormActions`** (`components/user-form-actions.tsx`)
+  - Botones de acción (Guardar, Cancelar, Eliminar)
+  - Confirmación de eliminación con AlertDialog
+  - Validación de permisos antes de eliminar
+  - Prevención de auto-eliminación
+
+- ✅ **`UsersView`** (`components/users-view.tsx`)
+  - Vista principal con filtro por empresa
+  - Selector de empresa con logo
+  - Integración con `UsersTable`
+  - Botón para crear nuevo usuario
+
+- ✅ **`UsersTable`** (`components/users-table.tsx`)
+  - Tabla completa con todas las funcionalidades
+  - Columnas: avatar, nombre, email, rol, empresa, estado, fecha de creación, acciones
+  - Filtros múltiples: nombre, email, rol, empresa, estado
+  - Búsqueda en tiempo real
+  - Ordenamiento por columnas (ascendente/descendente)
+  - Paginación avanzada con selector de items por página
+  - Acciones: ver documento, editar, eliminar, reenviar correo
+  - Indicadores visuales de estado (activo/inactivo)
+  - Badges de rol con iconos
+
+- ✅ **`UserDocumentView`** (`components/user-document-view.tsx`)
+  - Vista de documento de usuario en modal
+  - Muestra información completa del usuario
+  - Incluye avatar, datos personales, empresa, rol, estado
+  - Diseño profesional y organizado
+
+#### API Routes
+
+- ✅ **`GET /api/users`** - Obtener todos los usuarios
+  - Solo Super Admin
+  - Retorna lista completa de usuarios con información de empresa
+  - Ordenados por fecha de creación
+
+- ✅ **`POST /api/users`** - Crear nuevo usuario
+  - Validación de permisos (Super Admin)
+  - Validación de datos con Zod (`createUserSchema`)
+  - Generación automática de contraseña segura
+  - Creación en Supabase Auth y user_profiles
+  - Envío automático de correo de bienvenida
+  - Validación de email único
+  - Validación de empresa válida
+
+- ✅ **`GET /api/users/[id]`** - Obtener usuario por ID
+  - Validación de permisos
+  - Retorna datos completos del usuario
+
+- ✅ **`PUT /api/users/[id]`** - Actualizar usuario
+  - Validación de permisos (Super Admin)
+  - Validación de datos con Zod (`updateUserSchema`)
+  - Actualización de email, nombre, rol, empresa, estado
+  - Cambio de contraseña opcional
+  - Actualización de avatar
+
+- ✅ **`DELETE /api/users/[id]`** - Eliminar usuario (desactivar)
+  - Validación de permisos (Super Admin)
+  - Prevención de auto-eliminación
+  - Desactivación en lugar de eliminación física (soft delete)
+  - Verificación de usuarios asociados
+
+- ✅ **`POST /api/users/[id]/resend-email`** - Reenviar correo de bienvenida
+  - Genera nueva contraseña temporal
+  - Actualiza contraseña en Supabase Auth
+  - Envía correo de bienvenida con nueva contraseña
+  - Útil para recuperación de acceso
+
+#### Funciones de Base de Datos
+
+- ✅ **`getAllUsers()`** (`lib/supabase/user.ts`)
+  - Obtiene todos los usuarios con información de empresa
+  - Solo accesible para Super Admin
+  - Incluye información completa de perfil
+
+- ✅ **`getUserProfileById(userId)`**
+  - Obtiene usuario por ID
+  - Super Admin puede ver cualquier usuario
+  - Incluye información de empresa
+
+- ✅ **`createUser(...)`**
+  - Crea nuevo usuario en auth.users y user_profiles
+  - Validación de permisos
+  - Validación de email único
+  - Validación de empresa válida
+  - Validación de roles (super_admin solo en empresa matriz, excepto excepciones)
+  - Solo Super Admin
+
+- ✅ **`updateUser(userId, updates)`**
+  - Actualiza información de usuario
+  - Actualización de email, nombre, rol, empresa, estado
+  - Cambio de contraseña opcional
+  - Solo Super Admin
+
+- ✅ **`deleteUser(userId)`**
+  - Desactiva usuario (soft delete)
+  - Prevención de auto-eliminación
+  - Solo Super Admin
+
+- ✅ **`reactivateUser(userId)`**
+  - Reactiva usuario desactivado
+  - Solo Super Admin
+
+- ✅ **`checkEmailExists(email)`**
+  - Verifica si un email ya está en uso
+  - Útil para validación antes de crear/actualizar
+
+#### Validaciones y Esquemas
+
+- ✅ **Esquemas de Validación** (`lib/validations/schemas.ts`)
+  - `createUserSchema` - Validación para crear usuario
+  - `updateUserSchema` - Validación para actualizar usuario
+  - `changeUserPasswordSchema` - Validación para cambiar contraseña
+  - Validación de email único
+  - Validación de roles válidos
+  - Validación de empresa válida
+  - Mensajes de error en español
+
+#### Características Técnicas
+
+- ✅ **Generación Automática de Contraseña**
+  - Contraseñas seguras de 12 caracteres
+  - Incluye mayúsculas, minúsculas, números y símbolos
+  - Función: `generateRandomPassword()`
+
+- ✅ **Envío de Correo de Bienvenida**
+  - Envío automático al crear usuario
+  - Incluye email y contraseña temporal
+  - Función: `sendWelcomeEmail()`
+  - Reenvío disponible desde la tabla
+
+- ✅ **Validación de Permisos**
+  - Validación en múltiples capas (UI, API, DB)
+  - Solo Super Admin puede gestionar usuarios
+  - Prevención de auto-eliminación
+
+- ✅ **Manejo de Errores**
+  - Validación de datos con Zod
+  - Mensajes de error claros y específicos
+  - Manejo de errores de red y conexión
+  - Logging para debugging
+
+- ✅ **UI/UX**
+  - Formularios responsivos y accesibles
+  - Estados de carga y feedback visual
+  - Confirmaciones para acciones destructivas
+  - Transiciones suaves entre vistas
+  - Filtros y búsqueda en tiempo real
+  - Paginación avanzada
+  - Ordenamiento por columnas
+
+- ✅ **Vista de Documento en Tiempo Real**
+  - Actualización automática al cambiar campos del formulario
+  - Vista previa del documento de usuario
+  - Diseño profesional y organizado
+
+#### Archivos Creados/Modificados
+
+##### Componentes Nuevos
+- `components/user-form.tsx` - Formulario de usuario
+- `components/user-form-actions.tsx` - Acciones del formulario
+- `components/user-document-view.tsx` - Vista de documento
+- `components/users-view.tsx` - Vista principal de usuarios
+- `components/users-table.tsx` - Tabla de usuarios
+
+##### Páginas Nuevas
+- `app/dashboard/users/page.tsx` - Listado de usuarios
+- `app/dashboard/users/new/page.tsx` - Crear usuario
+- `app/dashboard/users/new/user-create-client.tsx` - Cliente de creación
+- `app/dashboard/users/[id]/edit/page.tsx` - Editar usuario
+- `app/dashboard/users/[id]/edit/user-edit-client.tsx` - Cliente de edición
+
+##### API Routes Nuevas
+- `app/api/users/route.ts` - CRUD de usuarios
+- `app/api/users/[id]/route.ts` - Operaciones por ID
+- `app/api/users/[id]/resend-email/route.ts` - Reenvío de correo
+
+##### Funciones de Base de Datos
+- `lib/supabase/user.ts` - Funciones de usuarios (completado)
+  - `getAllUsers()`
+  - `getUserProfileById()`
+  - `createUser()`
+  - `updateUser()`
+  - `deleteUser()`
+  - `reactivateUser()`
+  - `checkEmailExists()`
+
+##### Tipos y Validaciones
+- `lib/types/user.ts` - Tipos de usuarios (actualizado)
+- `lib/validations/schemas.ts` - Esquemas de validación (actualizado)
+  - `createUserSchema`
+  - `updateUserSchema`
+  - `changeUserPasswordSchema`
+
+#### Funcionalidades Especiales
+
+- ✅ **Filtros Avanzados**
+  - Filtro por nombre (búsqueda parcial)
+  - Filtro por email (búsqueda parcial)
+  - Filtro por rol (super_admin, admin, collaborator)
+  - Filtro por empresa (todas o específica)
+  - Filtro por estado (activo, inactivo, todos)
+
+- ✅ **Ordenamiento**
+  - Ordenamiento por nombre (ascendente/descendente)
+  - Ordenamiento por email (ascendente/descendente)
+  - Ordenamiento por rol (ascendente/descendente)
+  - Ordenamiento por empresa (ascendente/descendente)
+  - Ordenamiento por fecha de creación (ascendente/descendente)
+  - Indicadores visuales de ordenamiento
+
+- ✅ **Paginación**
+  - Paginación configurable (5, 10, 20, 50, 100 items por página)
+  - Navegación entre páginas
+  - Indicador de página actual
+  - Total de páginas y items
+
+- ✅ **Vista de Documento**
+  - Modal con información completa del usuario
+  - Diseño profesional y organizado
+  - Incluye avatar, datos personales, empresa, rol, estado
+  - Actualización en tiempo real desde el formulario
+
+- ✅ **Reenvío de Correo**
+  - Genera nueva contraseña temporal
+  - Actualiza contraseña en Supabase Auth
+  - Envía correo de bienvenida con nueva contraseña
+  - Útil para recuperación de acceso
+
+### Problemas Resueltos
+
+1. **Validación de email único**
+   - Solución: Función `checkEmailExists()` antes de crear/actualizar
+   - Estado: ✅ Resuelto
+
+2. **Prevención de auto-eliminación**
+   - Solución: Validación en `deleteUser()` verificando ID del usuario actual
+   - Estado: ✅ Resuelto
+
+3. **Validación de roles por empresa**
+   - Solución: Validación en `createUser()` verificando empresa matriz para super_admin
+   - Estado: ✅ Resuelto
+
+4. **Envío de correo de bienvenida**
+   - Solución: Integración con `sendWelcomeEmail()` después de crear usuario
+   - Estado: ✅ Resuelto
+
+5. **Vista de documento en tiempo real**
+   - Solución: Callback `onFormChange` con debounce para actualizar documento
+   - Estado: ✅ Resuelto
+
+6. **Filtros y búsqueda en tiempo real**
+   - Solución: Estados de React con `useMemo` para filtrado eficiente
+   - Estado: ✅ Resuelto
+
+7. **Paginación y ordenamiento**
+   - Solución: Estados de React con cálculos en `useMemo` para rendimiento
+   - Estado: ✅ Resuelto
+
+---
+
 **Última actualización**: Diciembre 2024
-**Versión de la implementación**: 1.2.0
-**Estado**: ✅ Infraestructura base completa + Gestión de perfil de usuario + Gestión de empresas implementadas
+**Versión de la implementación**: 1.3.0
+**Estado**: ✅ Infraestructura base completa + Gestión de perfil de usuario + Gestión de empresas + Gestión de usuarios implementadas
 

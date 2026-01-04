@@ -176,6 +176,18 @@ Para más detalles sobre el contexto, alcance y arquitectura del proyecto, consu
 
 🚧 **En Desarrollo** - MVP 1.0
 
+### Módulos Completados ✅
+
+- ✅ **Infraestructura Base**: Conexión con Supabase, despliegue en Vercel, autenticación
+- ✅ **Gestión de Perfil de Usuario**: Edición de perfil, subida de avatar, recorte de imagen
+- ✅ **Gestión de Empresas**: CRUD completo de empresas, redes sociales, organigrama
+- ✅ **Gestión de Usuarios**: CRUD completo de usuarios, filtros avanzados, paginación, reenvío de correo
+
+### Próximos Módulos 🚧
+
+- 🚧 **Gestión de Marcas**: Configuración de marca, librería de activos, manual de marca
+- 🚧 **Generador de Firma de Correo**: Plantillas, formulario, vista previa, exportación
+
 ## Licencia
 
 Apache License 2.0 - Ver [LICENSE](./LICENSE) para más detalles.

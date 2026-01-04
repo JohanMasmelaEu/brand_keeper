@@ -238,3 +238,92 @@ export type UpdateUserFormData = z.infer<typeof updateUserSchema>
  */
 export type ChangeUserPasswordFormData = z.infer<typeof changeUserPasswordSchema>
 
+/**
+ * Esquema de validación para creación de plantilla de firma
+ */
+export const createEmailSignatureTemplateSchema = z.object({
+  company_id: z.string().uuid("El ID de la empresa no es válido"),
+  name: z
+    .string()
+    .min(2, "El nombre debe tener al menos 2 caracteres")
+    .max(255, "El nombre no puede tener más de 255 caracteres"),
+  description: z
+    .string()
+    .max(1000, "La descripción no puede tener más de 1000 caracteres")
+    .optional()
+    .nullable(),
+  template_type: z.enum(["simple", "with_photo", "vertical"], {
+    message: "El tipo de plantilla no es válido",
+  }),
+  html_content: z
+    .string()
+    .min(10, "El contenido HTML debe tener al menos 10 caracteres"),
+  is_global: z.boolean().optional().default(false),
+  is_active: z.boolean().optional().default(true),
+})
+
+/**
+ * Esquema de validación para actualización de plantilla de firma
+ */
+export const updateEmailSignatureTemplateSchema = z.object({
+  name: z
+    .string()
+    .min(2, "El nombre debe tener al menos 2 caracteres")
+    .max(255, "El nombre no puede tener más de 255 caracteres")
+    .optional(),
+  description: z
+    .string()
+    .max(1000, "La descripción no puede tener más de 1000 caracteres")
+    .optional()
+    .nullable(),
+  template_type: z.enum(["simple", "with_photo", "vertical"], {
+    message: "El tipo de plantilla no es válido",
+  }).optional(),
+  html_content: z
+    .string()
+    .min(10, "El contenido HTML debe tener al menos 10 caracteres")
+    .optional(),
+  is_global: z.boolean().optional(),
+  is_active: z.boolean().optional(),
+})
+
+/**
+ * Esquema de validación para formulario de generación de firma
+ */
+export const emailSignatureFormSchema = z.object({
+  template_id: z.string().uuid("El ID de la plantilla no es válido"),
+  full_name: fullNameSchema,
+  position: z
+    .string()
+    .min(2, "El cargo debe tener al menos 2 caracteres")
+    .max(100, "El cargo no puede tener más de 100 caracteres"),
+  phone: z
+    .string()
+    .min(10, "El teléfono debe tener al menos 10 dígitos")
+    .max(20, "El teléfono no puede tener más de 20 caracteres")
+    .regex(/^[\d\s\-\+\(\)]+$/, "El teléfono contiene caracteres inválidos"),
+  phone_extension: z
+    .string()
+    .max(10, "La extensión no puede tener más de 10 caracteres")
+    .optional()
+    .or(z.literal("")),
+  email: emailSchema,
+  website: urlSchema,
+  photo_url: urlSchema,
+})
+
+/**
+ * Tipo inferido para creación de plantilla de firma
+ */
+export type CreateEmailSignatureTemplateFormData = z.infer<typeof createEmailSignatureTemplateSchema>
+
+/**
+ * Tipo inferido para actualización de plantilla de firma
+ */
+export type UpdateEmailSignatureTemplateFormData = z.infer<typeof updateEmailSignatureTemplateSchema>
+
+/**
+ * Tipo inferido para formulario de generación de firma
+ */
+export type EmailSignatureFormFormData = z.infer<typeof emailSignatureFormSchema>
+
