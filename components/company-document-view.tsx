@@ -25,9 +25,10 @@ interface CompanyDocumentViewProps {
   socialMedia?: CompanySocialMedia[] // Prop opcional para redes sociales en tiempo real
   isLoading?: boolean // Prop para mostrar loader
   showSuccess?: boolean // Prop para mostrar animación de éxito
+  isCreating?: boolean // Prop para indicar si está en modo creación (muestra placeholders)
 }
 
-export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isLoading = false, showSuccess = false }: CompanyDocumentViewProps) {
+export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isLoading = false, showSuccess = false, isCreating = false }: CompanyDocumentViewProps) {
   const [countries, setCountries] = React.useState<Country[]>([])
   const [socialMedia, setSocialMedia] = React.useState<CompanySocialMedia[]>([])
   const [isLoadingSocialMedia, setIsLoadingSocialMedia] = React.useState(false)
@@ -328,7 +329,11 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
                   Nombre Legal / Razón Social
                 </label>
                 <p className="text-base text-gray-900 mt-1">
-                  {company.legal_name || <span className="text-gray-400 italic">No especificado</span>}
+                  {company.legal_name || (
+                    <span className="text-gray-400 italic">
+                      {isCreating ? "Nombre Legal / Razón Social" : "No especificado"}
+                    </span>
+                  )}
                 </p>
               </div>
             </div>
@@ -351,7 +356,9 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
                       <span>{company.country}</span>
                     </>
                   ) : (
-                    <span className="text-gray-400 italic">No especificado</span>
+                    <span className="text-gray-400 italic">
+                      {isCreating ? "País" : "No especificado"}
+                    </span>
                   )}
                 </p>
               </div>
@@ -363,7 +370,11 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
                   Dirección
                 </label>
                 <p className="text-base text-gray-900 mt-1">
-                  {company.address || <span className="text-gray-400 italic">No especificada</span>}
+                  {company.address || (
+                    <span className="text-gray-400 italic">
+                      {isCreating ? "Dirección de la Empresa" : "No especificada"}
+                    </span>
+                  )}
                 </p>
               </div>
             </div>
@@ -390,7 +401,9 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
                     {company.website}
                   </a>
                 ) : (
-                  <p className="text-base text-gray-400 italic mt-1">No especificado</p>
+                  <p className="text-base text-gray-400 italic mt-1">
+                    {isCreating ? "Sitio Web" : "No especificado"}
+                  </p>
                 )}
               </div>
             </div>
@@ -435,7 +448,9 @@ export function CompanyDocumentView({ company, socialMedia: propSocialMedia, isL
                     </div>
                   </TooltipProvider>
                 ) : (
-                  <p className="text-base text-gray-400 italic mt-1">No especificado</p>
+                  <p className="text-base text-gray-400 italic mt-1">
+                    {isCreating ? "Redes Sociales" : "No especificado"}
+                  </p>
                 )}
               </div>
             </div>

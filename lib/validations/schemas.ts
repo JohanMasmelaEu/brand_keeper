@@ -186,3 +186,55 @@ export type CreateCompanyFormData = z.infer<typeof createCompanySchema>
  */
 export type UpdateCompanyFormData = z.infer<typeof updateCompanySchema>
 
+/**
+ * Esquema de validación para creación de usuario
+ * Nota: La contraseña se genera automáticamente y se envía por correo
+ */
+export const createUserSchema = z.object({
+  email: emailSchema,
+  full_name: fullNameSchema,
+  role: z.enum(["super_admin", "admin", "collaborator"], {
+    message: "El rol seleccionado no es válido",
+  }),
+  company_id: z.string().uuid("El ID de la empresa no es válido"),
+})
+
+/**
+ * Esquema de validación para actualización de usuario
+ */
+export const updateUserSchema = z.object({
+  email: emailSchema.optional(),
+  full_name: fullNameSchema,
+  role: z.enum(["super_admin", "admin", "collaborator"], {
+    message: "El rol seleccionado no es válido",
+  }).optional(),
+  company_id: z.string().uuid("El ID de la empresa no es válido").optional(),
+  is_active: z.boolean().optional(),
+})
+
+/**
+ * Esquema de validación para cambio de contraseña de usuario (por admin)
+ */
+export const changeUserPasswordSchema = z.object({
+  password: passwordSchema,
+  confirm_password: z.string().min(1, "La confirmación de contraseña es requerida"),
+}).refine((data) => data.password === data.confirm_password, {
+  message: "Las contraseñas no coinciden",
+  path: ["confirm_password"],
+})
+
+/**
+ * Tipo inferido para creación de usuario
+ */
+export type CreateUserFormData = z.infer<typeof createUserSchema>
+
+/**
+ * Tipo inferido para actualización de usuario
+ */
+export type UpdateUserFormData = z.infer<typeof updateUserSchema>
+
+/**
+ * Tipo inferido para cambio de contraseña de usuario
+ */
+export type ChangeUserPasswordFormData = z.infer<typeof changeUserPasswordSchema>
+

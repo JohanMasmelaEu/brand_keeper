@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, X, AlertCircle, Info, CheckCircle2 } from "lucide-react"
+import { Check, X, AlertCircle, Info, CheckCircle2, CircleCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { LucideIcon } from "lucide-react"
 
@@ -45,7 +45,7 @@ const variantConfig: Record<
   }
 > = {
   success: {
-    icon: CheckCircle2,
+    icon: Check,
     textColor: "text-primary-foreground",
     borderColor: "border-primary",
     bgColor: "bg-primary",
@@ -169,69 +169,54 @@ export function CheckSealAnimation({
 
   return (
     <div className={containerClasses}>
-      <div className="relative">
-        {/* Círculo de fondo con animación de sello */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className={cn("relative", sizeConfigValue.container)}>
-            {/* Anillos concéntricos que se expanden */}
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={`ring-${i}`}
-                className={cn(
-                  "absolute rounded-full border-4 animate-ping",
-                  config.borderColor,
-                  i === 0 && "inset-0 opacity-30",
-                  i === 1 && "inset-2 opacity-50",
-                  i === 2 && "inset-4 opacity-70"
-                )}
-                style={{ animationDelay: `${i * 0.2}s` }}
-              />
-            ))}
-
-            {/* Círculos concéntricos con efecto de sello */}
-            {Array.from({ length: sizeConfigValue.rings }).map((_, i) => {
-              const inset = (i * 2) * 4
-              return (
-                <div
-                  key={`circle-${i}`}
-                  className={cn(
-                    "absolute rounded-full animate-scale-in",
-                    config.bgColor
-                  )}
-                  style={{
-                    inset: `${inset}px`,
-                    opacity: (20 + i * 15) / 100,
-                    animationDelay: `${i * 0.1}s`,
-                  }}
-                />
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Icono */}
-        <div className="relative z-10 flex flex-col items-center justify-center gap-2">
-          <div
-            className={cn(
-              "rounded-full p-4 shadow-2xl animate-scale-in-bounce",
-              config.bgColor
-            )}
-          >
-            <Icon
-              className={cn(
-                sizeConfigValue.icon,
-                config.textColor,
-                "stroke-[4]",
-                iconClassName
-              )}
-            />
-          </div>
-          {message && (
-            <p className="text-sm font-medium text-foreground animate-in fade-in duration-300">
-              {message}
-            </p>
+      {/* Icono */}
+      <div className="relative z-10 flex flex-col items-center justify-center gap-2" style={{ width: "fit-content", height: "fit-content" }}>
+        <div
+          className={cn(
+            "rounded-full flex items-center justify-center shadow-2xl",
+            config.bgColor
           )}
+          style={{
+            width: size === "sm" ? "64px" : size === "md" ? "80px" : "96px",
+            height: size === "sm" ? "64px" : size === "md" ? "80px" : "96px",
+            minWidth: size === "sm" ? "64px" : size === "md" ? "80px" : "96px",
+            minHeight: size === "sm" ? "64px" : size === "md" ? "80px" : "96px",
+            maxWidth: size === "sm" ? "64px" : size === "md" ? "80px" : "96px",
+            maxHeight: size === "sm" ? "64px" : size === "md" ? "80px" : "96px",
+            borderRadius: "50%",
+            aspectRatio: "1 / 1",
+            animation: "scale-in-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards",
+            transformOrigin: "center center",
+            boxSizing: "border-box",
+            padding: 0,
+            margin: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            flexGrow: 0,
+          }}
+        >
+          <Icon
+            className={cn(
+              sizeConfigValue.icon,
+              config.textColor,
+              "stroke-[3]",
+              iconClassName
+            )}
+            style={{
+              width: size === "sm" ? "32px" : size === "md" ? "40px" : "48px",
+              height: size === "sm" ? "32px" : size === "md" ? "40px" : "48px",
+              flexShrink: 0,
+              display: "block",
+            }}
+          />
         </div>
+        {message && (
+          <p className="text-sm font-medium text-foreground animate-in fade-in duration-300">
+            {message}
+          </p>
+        )}
       </div>
     </div>
   )

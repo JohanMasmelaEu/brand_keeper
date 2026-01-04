@@ -1,27 +1,46 @@
 import { redirect } from "next/navigation"
 import { Suspense } from "react"
-import { getUserProfile } from "@/lib/supabase/user"
-import { CompanyCreateClient } from "./company-create-client"
+import { getUserProfile, getUserProfileById } from "@/lib/supabase/user"
+import { getAllCompanies } from "@/lib/supabase/company"
+import { UserEditClient } from "./user-edit-client"
 import { FormSkeleton } from "@/components/page-skeleton"
 
-async function NewCompanyContent() {
+async function EditUserContent({
+  id,
+}: {
+  id: string
+}) {
+  const [user, companies] = await Promise.all([
+    getUserProfileById(id),
+    getAllCompanies(),
+  ])
+
+  if (!user) {
+    redirect("/dashboard/users")
+  }
+
   return (
     <div className="w-full">
       <div className="mb-6 sm:mb-8">
         <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-2 break-words">
-          Nueva Empresa
+          Editar Usuario
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground break-words">
-          Crea una nueva empresa hija
+          Actualiza la información del usuario
         </p>
       </div>
 
-      <CompanyCreateClient />
+      <UserEditClient user={user} companies={companies} />
     </div>
   )
 }
 
-export default async function NewCompanyPage() {
+export default async function EditUserPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
   const profile = await getUserProfile()
 
   if (!profile) {
@@ -35,7 +54,7 @@ export default async function NewCompanyPage() {
 
   return (
     <Suspense fallback={<FormSkeleton />}>
-      <NewCompanyContent />
+      <EditUserContent id={id} />
     </Suspense>
   )
 }
