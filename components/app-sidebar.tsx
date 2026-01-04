@@ -188,7 +188,7 @@ export function AppSidebar({ userRole, userName, userEmail, companyName, avatarU
               width={0}
               height={0}
               sizes="(max-width: 256px) 100vw, 256px"
-              className="w-full h-auto object-contain transition-all duration-500 ease-out"
+              className="w-full h-auto object-contain transition-all duration-500 ease-out smooth-gif-animation"
               unoptimized
             />
           </div>

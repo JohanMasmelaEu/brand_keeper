@@ -369,7 +369,7 @@ export function UserProfileModal({
             )}
 
             {updateSuccess && (
-              <div className="rounded-md bg-green-500/15 p-3 text-sm text-green-600 dark:text-green-400">
+              <div className="rounded-md bg-success-light p-3 text-sm text-success font-medium">
                 Perfil actualizado correctamente
               </div>
             )}

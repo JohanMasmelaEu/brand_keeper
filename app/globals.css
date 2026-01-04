@@ -35,6 +35,10 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Color verde con mejor contraste para tablas y elementos de éxito */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 142 71% 95%;
   }
 
   .dark {
@@ -68,6 +72,10 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Color verde con mejor contraste para tablas y elementos de éxito */
+    --success: 142 71% 45%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 142 71% 95%;
   }
 }
 
@@ -191,6 +199,79 @@
 
   .animate-scale-in-bounce {
     animation: scale-in-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+
+  /* Suavizado para animaciones GIF en el sidebar */
+  .smooth-gif-animation {
+    image-rendering: auto;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translateZ(0);
+    /* Suavizado adicional con filtro sutil */
+    filter: contrast(1.02) brightness(1.01);
+    /* Mejora de renderizado */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Animación de hover para iconos de tablas - Uso general */
+  .icon-hover {
+    transition: transform 200ms ease-in-out, color 200ms ease-in-out;
+    display: inline-block;
+    will-change: transform, color;
+  }
+
+  /* Cuando el botón tiene hover, el icono dentro crece y cambia de color */
+  button:hover .icon-hover,
+  a:hover .icon-hover {
+    transform: scale(1.25);
+    color: hsl(var(--primary));
+  }
+
+  button:active .icon-hover,
+  a:active .icon-hover {
+    transform: scale(1.1);
+  }
+
+  /* Animación de hover solo para escala (sin cambio de color) - Para columna Acciones */
+  .icon-hover-scale {
+    transition: transform 200ms ease-in-out;
+    display: inline-block;
+    will-change: transform;
+  }
+
+  /* Cuando el botón tiene hover, el icono dentro crece pero mantiene su color */
+  button:hover .icon-hover-scale,
+  a:hover .icon-hover-scale {
+    transform: scale(1.25);
+  }
+
+  button:active .icon-hover-scale,
+  a:active .icon-hover-scale {
+    transform: scale(1.1);
+  }
+
+  /* Eliminar fondo en hover para botones con iconos en tablas */
+  button:hover .icon-hover,
+  button:hover .icon-hover-scale {
+    background-color: transparent !important;
+  }
+  
+  /* Sobrescribir el hover:bg-accent del botón ghost cuando contiene icon-hover */
+  button:has(.icon-hover):hover,
+  button:has(.icon-hover-scale):hover {
+    background-color: transparent !important;
+  }
+
+  /* Clase generalizada para columna de Acciones en tablas */
+  .table-actions-column {
+    text-align: center;
+  }
+
+  .table-actions-column > div {
+    justify-content: center;
   }
 }
 
