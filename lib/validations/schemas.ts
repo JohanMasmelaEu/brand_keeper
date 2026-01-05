@@ -96,14 +96,60 @@ export const changePasswordSchema = z
   })
 
 /**
- * Esquema de validación para configuración de marca
+ * Esquema de validación para creación de configuración de marca
  */
-export const brandSettingsSchema = z.object({
+export const createBrandSettingsSchema = z.object({
   company_id: z.string().uuid("El ID de la empresa no es válido"),
   primary_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "El color primario debe ser un código hexadecimal válido"),
-  secondary_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "El color secundario debe ser un código hexadecimal válido").optional(),
+  secondary_color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, "El color secundario debe ser un código hexadecimal válido")
+    .optional()
+    .nullable(),
+  tertiary_color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, "El color terciario debe ser un código hexadecimal válido")
+    .optional()
+    .nullable(),
+  negative_color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, "El color negativo debe ser un código hexadecimal válido")
+    .optional()
+    .nullable(),
+  font_family: z.string().min(1, "La fuente principal es requerida"),
+  secondary_font: z.string().min(1, "La fuente secundaria debe tener al menos 1 carácter").optional().nullable(),
+  contrast_font: z.string().min(1, "La fuente de contraste debe tener al menos 1 carácter").optional().nullable(),
   logo_url: urlSchema,
-  font_family: z.string().min(1, "La fuente es requerida").optional(),
+  is_global: z.boolean().optional().default(false),
+})
+
+/**
+ * Esquema de validación para actualización de configuración de marca
+ */
+export const updateBrandSettingsSchema = z.object({
+  primary_color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, "El color primario debe ser un código hexadecimal válido")
+    .optional(),
+  secondary_color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, "El color secundario debe ser un código hexadecimal válido")
+    .optional()
+    .nullable(),
+  tertiary_color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, "El color terciario debe ser un código hexadecimal válido")
+    .optional()
+    .nullable(),
+  negative_color: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/, "El color negativo debe ser un código hexadecimal válido")
+    .optional()
+    .nullable(),
+  font_family: z.string().min(1, "La fuente principal es requerida").optional(),
+  secondary_font: z.string().min(1, "La fuente secundaria debe tener al menos 1 carácter").optional().nullable(),
+  contrast_font: z.string().min(1, "La fuente de contraste debe tener al menos 1 carácter").optional().nullable(),
+  logo_url: urlSchema,
 })
 
 /**
@@ -172,9 +218,14 @@ export const updateCompanySchema = companySchema.partial().extend({
 })
 
 /**
- * Tipo inferido para configuración de marca
+ * Tipo inferido para creación de configuración de marca
  */
-export type BrandSettingsFormData = z.infer<typeof brandSettingsSchema>
+export type CreateBrandSettingsFormData = z.infer<typeof createBrandSettingsSchema>
+
+/**
+ * Tipo inferido para actualización de configuración de marca
+ */
+export type UpdateBrandSettingsFormData = z.infer<typeof updateBrandSettingsSchema>
 
 /**
  * Tipo inferido para creación de empresa

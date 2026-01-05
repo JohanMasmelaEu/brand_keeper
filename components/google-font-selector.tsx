@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
+import { Check, ChevronsUpDown, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -18,40 +18,11 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-// Lista de fuentes populares de Google Fonts
-// Formato: { value: "Font Name", label: "Font Name" }
-const GOOGLE_FONTS = [
-  { value: "", label: "Sin fuente personalizada" },
-  { value: "Roboto", label: "Roboto" },
-  { value: "Open Sans", label: "Open Sans" },
-  { value: "Lato", label: "Lato" },
-  { value: "Montserrat", label: "Montserrat" },
-  { value: "Poppins", label: "Poppins" },
-  { value: "Raleway", label: "Raleway" },
-  { value: "Inter", label: "Inter" },
-  { value: "Source Sans Pro", label: "Source Sans Pro" },
-  { value: "Nunito", label: "Nunito" },
-  { value: "Ubuntu", label: "Ubuntu" },
-  { value: "Playfair Display", label: "Playfair Display" },
-  { value: "Merriweather", label: "Merriweather" },
-  { value: "Oswald", label: "Oswald" },
-  { value: "PT Sans", label: "PT Sans" },
-  { value: "Dancing Script", label: "Dancing Script" },
-  { value: "Crimson Text", label: "Crimson Text" },
-  { value: "Libre Baskerville", label: "Libre Baskerville" },
-  { value: "Work Sans", label: "Work Sans" },
-  { value: "Fira Sans", label: "Fira Sans" },
-  { value: "Quicksand", label: "Quicksand" },
-  { value: "Rubik", label: "Rubik" },
-  { value: "Mukta", label: "Mukta" },
-  { value: "Barlow", label: "Barlow" },
-  { value: "DM Sans", label: "DM Sans" },
-  { value: "Noto Sans", label: "Noto Sans" },
-  { value: "Comfortaa", label: "Comfortaa" },
-  { value: "Josefin Sans", label: "Josefin Sans" },
-  { value: "Cabin", label: "Cabin" },
-  { value: "Karla", label: "Karla" },
-] as const
+interface GoogleFont {
+  family: string
+  variants?: string[]
+  category?: string
+}
 
 interface GoogleFontSelectorProps {
   value?: string
@@ -65,11 +36,51 @@ export function GoogleFontSelector({
   disabled = false,
 }: GoogleFontSelectorProps) {
   const [open, setOpen] = React.useState(false)
+  const [fonts, setFonts] = React.useState<GoogleFont[]>([])
+  const [isLoading, setIsLoading] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
+
+  // Cargar fuentes cuando se abre el popover por primera vez
+  React.useEffect(() => {
+    if (open && fonts.length === 0 && !isLoading && !error) {
+      loadFonts()
+    }
+  }, [open])
+
+  const loadFonts = async () => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const response = await fetch("/api/google-fonts")
+      if (!response.ok) {
+        throw new Error("Error al cargar las fuentes")
+      }
+      const data = await response.json()
+      setFonts(data.fonts || [])
+    } catch (err) {
+      console.error("Error al cargar Google Fonts:", err)
+      setError("No se pudieron cargar las fuentes")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Preparar lista de fuentes con opción de "Sin fuente personalizada"
+  const fontOptions = React.useMemo(() => {
+    const options = [{ value: "", label: "Sin fuente personalizada" }]
+    fonts.forEach((font) => {
+      options.push({
+        value: font.family,
+        label: font.family,
+      })
+    })
+    return options
+  }, [fonts])
 
   const selectedFont = React.useMemo(() => {
     if (!value) return null
-    return GOOGLE_FONTS.find((font) => font.value === value)
-  }, [value])
+    return fontOptions.find((font) => font.value === value)
+  }, [value, fontOptions])
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -91,37 +102,60 @@ export function GoogleFontSelector({
         <Command>
           <CommandInput placeholder="Buscar fuente..." />
           <CommandList>
-            <CommandEmpty>No se encontró la fuente.</CommandEmpty>
-            <CommandGroup>
-              {GOOGLE_FONTS.map((font) => (
-                <CommandItem
-                  key={font.value}
-                  value={font.value}
-                  onSelect={() => {
-                    onValueChange(font.value === value ? "" : font.value)
-                    setOpen(false)
-                  }}
+            {isLoading ? (
+              <div className="flex items-center justify-center py-6">
+                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                <span className="ml-2 text-sm text-muted-foreground">
+                  Cargando fuentes...
+                </span>
+              </div>
+            ) : error ? (
+              <div className="flex flex-col items-center justify-center py-6 px-4">
+                <p className="text-sm text-destructive mb-2">{error}</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={loadFonts}
+                  className="mt-2"
                 >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === font.value ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  <span
-                    style={
-                      font.value
-                        ? {
-                            fontFamily: `"${font.value}", sans-serif`,
-                          }
-                        : undefined
-                    }
-                  >
-                    {font.label}
-                  </span>
-                </CommandItem>
-              ))}
-            </CommandGroup>
+                  Reintentar
+                </Button>
+              </div>
+            ) : (
+              <>
+                <CommandEmpty>No se encontró la fuente.</CommandEmpty>
+                <CommandGroup>
+                  {fontOptions.map((font) => (
+                    <CommandItem
+                      key={font.value}
+                      value={font.value}
+                      onSelect={() => {
+                        onValueChange(font.value === value ? "" : font.value)
+                        setOpen(false)
+                      }}
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          value === font.value ? "opacity-100" : "opacity-0"
+                        )}
+                      />
+                      <span
+                        style={
+                          font.value
+                            ? {
+                                fontFamily: `"${font.value}", sans-serif`,
+                              }
+                            : undefined
+                        }
+                      >
+                        {font.label}
+                      </span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>
