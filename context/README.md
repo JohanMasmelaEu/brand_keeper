@@ -29,6 +29,15 @@ Los archivos en esta carpeta proporcionan contexto detallado sobre aspectos espe
     - ✅ Gestión de Perfil de Usuario
     - ✅ Gestión de Empresas
     - ✅ Gestión de Usuarios
+    - ✅ Generador de Firma de Correo (provisional - requiere Configuración de Marca)
+
+- **BRAND_CONFIGURATION.md** - Especificación completa del módulo de Configuración de Marca:
+  - Estructura de base de datos requerida
+  - API routes necesarias
+  - Componentes a implementar
+  - Integración con módulo de firmas
+  - Políticas de seguridad RLS
+  - Guía de implementación
 
 ### Configuración y Setup
 

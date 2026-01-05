@@ -43,6 +43,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { GoogleFontSelector } from "@/components/google-font-selector"
 
 interface EmailSignatureTemplateFormProps {
   template?: EmailSignatureTemplate
@@ -79,6 +80,7 @@ export function EmailSignatureTemplateForm({
           description: template.description || "",
           template_type: template.template_type,
           html_content: template.html_content,
+          google_font: template.google_font || "",
           is_global: template.is_global,
           is_active: template.is_active,
         }
@@ -87,6 +89,7 @@ export function EmailSignatureTemplateForm({
           description: "",
           template_type: "simple",
           html_content: "",
+          google_font: "",
           is_global: false,
           is_active: true,
           company_id: userCompanyId,
@@ -98,6 +101,7 @@ export function EmailSignatureTemplateForm({
   const description = form.watch("description")
   const template_type = form.watch("template_type")
   const html_content = form.watch("html_content")
+  const google_font = form.watch("google_font")
   const is_global = form.watch("is_global")
   const is_active = form.watch("is_active")
   const company_id = form.watch("company_id")
@@ -112,6 +116,7 @@ export function EmailSignatureTemplateForm({
       description,
       template_type,
       html_content,
+      google_font,
       is_global,
       is_active,
       company_id,
@@ -126,7 +131,7 @@ export function EmailSignatureTemplateForm({
       onFormChange(currentValues)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, description, template_type, html_content, is_global, is_active, company_id])
+  }, [name, description, template_type, html_content, google_font, is_global, is_active, company_id])
 
   // Determinar qué empresas puede seleccionar el usuario
   const availableCompanies = React.useMemo(() => {
@@ -346,7 +351,28 @@ export function EmailSignatureTemplateForm({
           )}
         />
 
-        {/* Row 3: Contenido HTML */}
+        {/* Row 3: Google Font */}
+        <FormField
+          control={form.control}
+          name="google_font"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Fuente de Google Fonts (opcional)</FormLabel>
+              <FormControl>
+                <GoogleFontSelector
+                  value={field.value || ""}
+                  onValueChange={field.onChange}
+                />
+              </FormControl>
+              <FormDescription>
+                Selecciona una fuente de Google Fonts para usar en la firma. La fuente se incluirá automáticamente en el HTML generado.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Row 4: Contenido HTML */}
         <FormField
           control={form.control}
           name="html_content"
@@ -387,7 +413,7 @@ export function EmailSignatureTemplateForm({
           )}
         />
 
-        {/* Row 4: Switches */}
+        {/* Row 5: Switches */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {mode === "create" && canCreateGlobal && (
             <FormField

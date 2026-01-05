@@ -343,7 +343,8 @@ Los siguientes elementos **NO** están incluidos en el MVP:
 
 **Versión**: MVP 1.0  
 **Última actualización**: Diciembre 2024  
-**Estado**: En desarrollo - Módulos completados: Gestión de Perfil, Gestión de Empresas, Gestión de Usuarios
+**Estado**: En desarrollo - Módulos completados: Gestión de Perfil, Gestión de Empresas, Gestión de Usuarios, Generador de Firma de Correo (provisional)  
+**Próximo módulo**: Configuración de Marca (requerido para completar funcionalidades de firmas)
 
 ## Documentación Adicional
 

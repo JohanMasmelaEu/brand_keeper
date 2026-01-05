@@ -29,6 +29,7 @@ import { Copy, Download, Eye } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { applyGoogleFontToHtml } from "@/components/google-font-selector"
 
 interface EmailSignatureGeneratorProps {
   templates: EmailSignatureTemplate[]
@@ -109,6 +110,11 @@ export function EmailSignatureGenerator({
 
     // Limpiar variables no reemplazadas
     html = html.replace(/\{[^}]+\}/g, "")
+
+    // Aplicar Google Font si está configurada
+    if (template.google_font && template.google_font.trim() !== "") {
+      html = applyGoogleFontToHtml(html, template.google_font)
+    }
 
     setGeneratedHtml(html)
   }

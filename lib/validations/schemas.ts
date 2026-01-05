@@ -258,6 +258,11 @@ export const createEmailSignatureTemplateSchema = z.object({
   html_content: z
     .string()
     .min(10, "El contenido HTML debe tener al menos 10 caracteres"),
+  google_font: z
+    .string()
+    .max(100, "El nombre de la fuente no puede tener más de 100 caracteres")
+    .optional()
+    .nullable(),
   is_global: z.boolean().optional().default(false),
   is_active: z.boolean().optional().default(true),
 })
@@ -283,6 +288,11 @@ export const updateEmailSignatureTemplateSchema = z.object({
     .string()
     .min(10, "El contenido HTML debe tener al menos 10 caracteres")
     .optional(),
+  google_font: z
+    .string()
+    .max(100, "El nombre de la fuente no puede tener más de 100 caracteres")
+    .optional()
+    .nullable(),
   is_global: z.boolean().optional(),
   is_active: z.boolean().optional(),
 })

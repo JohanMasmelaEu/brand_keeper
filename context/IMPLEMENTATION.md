@@ -1167,7 +1167,363 @@ Durante la configuración inicial, se resolvieron los siguientes problemas:
 
 ---
 
-**Última actualización**: Diciembre 2024
-**Versión de la implementación**: 1.3.0
-**Estado**: ✅ Infraestructura base completa + Gestión de perfil de usuario + Gestión de empresas + Gestión de usuarios implementadas
+### Generador de Firma de Correo ✅ COMPLETADO (PROVISIONAL)
+
+**Estado**: Implementado y Funcionando - Diciembre 2024  
+**Nota**: Este módulo está funcional pero requiere la implementación del módulo de **Configuración de Marca** para poder usar los elementos de marca (colores, tipografías, logos) en las firmas.
+
+#### Páginas y Rutas
+
+- ✅ **Listado de Plantillas** (`/dashboard/email-signatures`)
+  - Página principal con tabla de todas las plantillas de firma
+  - Filtros por empresa, tipo, estado
+  - Vista previa de plantillas
+  - Acceso según permisos (Super Admin ve todas, Admin solo las de su empresa)
+  - Componente: `EmailSignaturesView` con `EmailSignaturesTable`
+
+- ✅ **Crear Plantilla** (`/dashboard/email-signatures/new`)
+  - Formulario completo para crear nueva plantilla
+  - Validación en tiempo real
+  - Vista previa en tiempo real
+  - Componente: `EmailSignatureTemplateForm` con modo `create`
+
+- ✅ **Editar Plantilla** (`/dashboard/email-signatures/[id]/edit`)
+  - Formulario para editar plantilla existente
+  - Carga datos existentes de la plantilla
+  - Validación de permisos
+  - Componente: `EmailSignatureTemplateEditClient` con `EmailSignatureTemplateForm` en modo `edit`
+
+- ✅ **Generador de Firma** (`/dashboard/email-signature-generator`)
+  - Página para colaboradores para generar su firma personalizada
+  - Selección de plantilla
+  - Formulario con datos personales
+  - Vista previa en tiempo real
+  - Exportación HTML (copiar al portapapeles o descargar)
+  - Componente: `EmailSignatureGenerator`
+
+#### Componentes Implementados
+
+- ✅ **`EmailSignatureTemplateForm`** (`components/email-signature-template-form.tsx`)
+  - Formulario reutilizable para crear/editar plantillas
+  - Campos: nombre, descripción, tipo, contenido HTML, fuente de Google Fonts, empresa, estado global/activo
+  - Selector de Google Fonts integrado
+  - Validación con React Hook Form y Zod
+  - Vista previa en tiempo real
+  - Manejo de estados de carga y errores
+
+- ✅ **`EmailSignatureTemplatePreview`** (`components/email-signature-template-preview.tsx`)
+  - Vista previa de plantilla con valores de ejemplo
+  - Actualización en tiempo real al cambiar el formulario
+  - Muestra información de la plantilla (nombre, tipo, empresa, estado)
+  - Renderizado HTML con estilos aplicados
+
+- ✅ **`EmailSignatureGenerator`** (`components/email-signature-generator.tsx`)
+  - Generador de firmas para colaboradores
+  - Selección de plantilla disponible
+  - Formulario con datos personales (nombre, cargo, teléfono, email, etc.)
+  - Vista previa en tiempo real
+  - Exportación HTML (copiar o descargar)
+
+- ✅ **`EmailSignaturesView`** (`components/email-signatures-view.tsx`)
+  - Vista principal con tabla de plantillas
+  - Botón para crear nueva plantilla
+  - Integración con `EmailSignaturesTable`
+
+- ✅ **`EmailSignaturesTable`** (`components/email-signatures-table.tsx`)
+  - Tabla con todas las plantillas
+  - Columnas: nombre, tipo, empresa, estado, acciones
+  - Acciones: editar, eliminar
+  - Filtros y búsqueda
+
+- ✅ **`GoogleFontSelector`** (`components/google-font-selector.tsx`)
+  - Selector de fuentes de Google Fonts
+  - Lista de 30 fuentes populares
+  - Búsqueda de fuentes
+  - Vista previa de fuente en el selector
+  - Funciones para aplicar fuentes al HTML embebidas
+
+#### Funcionalidades Especiales
+
+- ✅ **Integración de Google Fonts Embebidas**
+  - Selector de Google Fonts en el formulario de plantillas
+  - Aplicación automática de fuentes al HTML generado
+  - Uso de `@import` dentro de `<style>` para compatibilidad con clientes de email
+  - Aplicación global de fuente a todos los elementos del HTML
+  - Campo `google_font` almacenado en la base de datos
+
+- ✅ **Generación de HTML con Variables**
+  - Sistema de variables en plantillas: `{full_name}`, `{position}`, `{phone}`, `{email}`, `{website}`, `{company_name}`, `{company_logo}`, `{photo_url}`
+  - Reemplazo automático de variables al generar firma
+  - Limpieza de variables no reemplazadas
+
+- ✅ **Vista Previa en Tiempo Real**
+  - Actualización automática al cambiar campos del formulario
+  - Renderizado HTML con estilos aplicados
+  - Valores de ejemplo para preview
+
+- ✅ **Exportación de HTML**
+  - Copiar HTML al portapapeles
+  - Descargar archivo HTML
+  - HTML listo para usar en clientes de correo
+
+#### API Routes
+
+- ✅ **`GET /api/email-signatures`** - Obtener todas las plantillas
+  - Filtrado por empresa según permisos
+  - Retorna plantillas globales y de la empresa del usuario
+  - Solo Super Admin ve todas las plantillas
+
+- ✅ **`POST /api/email-signatures`** - Crear nueva plantilla
+  - Validación de permisos (Super Admin o Admin)
+  - Validación de datos con Zod (`createEmailSignatureTemplateSchema`)
+  - Validación de empresa (Admin solo puede crear para su empresa)
+  - Validación de plantillas globales (solo empresa matriz)
+
+- ✅ **`GET /api/email-signatures/[id]`** - Obtener plantilla por ID
+  - Validación de permisos
+  - Retorna datos completos de la plantilla
+
+- ✅ **`PUT /api/email-signatures/[id]`** - Actualizar plantilla
+  - Validación de permisos (Super Admin o Admin)
+  - Validación de datos con Zod (`updateEmailSignatureTemplateSchema`)
+  - Admin solo puede actualizar plantillas de su empresa (no globales)
+
+- ✅ **`DELETE /api/email-signatures/[id]`** - Eliminar plantilla
+  - Validación de permisos
+  - Solo Super Admin o Admin de la empresa propietaria
+
+#### Funciones de Base de Datos
+
+- ✅ **`getAllEmailSignatureTemplates()`** (`lib/supabase/email-signature.ts`)
+  - Obtiene todas las plantillas según permisos
+  - Filtrado por empresa y plantillas globales
+  - Solo Super Admin ve todas las plantillas
+
+- ✅ **`getEmailSignatureTemplateById(templateId)`**
+  - Obtiene plantilla por ID
+  - Validación de permisos
+
+- ✅ **`getAvailableTemplatesForUser()`**
+  - Obtiene plantillas disponibles para un usuario
+  - Incluye plantillas globales y de su empresa
+
+- ✅ **`createEmailSignatureTemplate(...)`**
+  - Crea nueva plantilla
+  - Validación de permisos
+  - Validación de empresa (Admin solo puede crear para su empresa)
+  - Validación de plantillas globales (solo empresa matriz)
+
+- ✅ **`updateEmailSignatureTemplate(templateId, updates)`**
+  - Actualiza plantilla
+  - Validación de permisos
+  - Admin solo puede actualizar plantillas de su empresa (no globales)
+
+- ✅ **`deleteEmailSignatureTemplate(templateId)`**
+  - Elimina plantilla
+  - Validación de permisos
+
+#### Validaciones y Esquemas
+
+- ✅ **Esquemas de Validación** (`lib/validations/schemas.ts`)
+  - `createEmailSignatureTemplateSchema` - Validación para crear plantilla
+  - `updateEmailSignatureTemplateSchema` - Validación para actualizar plantilla
+  - `emailSignatureFormSchema` - Validación para generar firma
+  - Campo `google_font` opcional para Google Fonts
+  - Validación de HTML mínimo
+  - Mensajes de error en español
+
+#### Características Técnicas
+
+- ✅ **Aplicación de Google Fonts Embebidas**
+  - Función `applyGoogleFontToHtml()` para aplicar fuentes al HTML
+  - Función `generateGoogleFontStyle()` para generar estilos de Google Fonts
+  - Uso de `@import` dentro de `<style>` para compatibilidad con emails
+  - Aplicación global de fuente con selector universal `*`
+  - Detección y actualización de estilos existentes
+
+- ✅ **Sistema de Variables en Plantillas**
+  - Reemplazo automático de variables al generar firma
+  - Variables soportadas: `{full_name}`, `{position}`, `{phone}`, `{phone_extension}`, `{email}`, `{website}`, `{company_name}`, `{company_logo}`, `{photo_url}`
+  - Limpieza de variables no reemplazadas
+
+- ✅ **Validación de Permisos**
+  - Validación en múltiples capas (UI, API, DB)
+  - Super Admin puede gestionar todas las plantillas
+  - Admin solo puede gestionar plantillas de su empresa (no globales)
+  - Colaboradores solo pueden generar firmas
+
+- ✅ **Manejo de Errores**
+  - Validación de datos con Zod
+  - Mensajes de error claros y específicos
+  - Manejo de errores de red y conexión
+  - Logging para debugging
+
+- ✅ **UI/UX**
+  - Formularios responsivos y accesibles
+  - Estados de carga y feedback visual
+  - Confirmaciones para acciones destructivas
+  - Transiciones suaves entre vistas
+  - Vista previa en tiempo real
+
+#### Archivos Creados/Modificados
+
+##### Componentes Nuevos
+- `components/email-signature-template-form.tsx` - Formulario de plantilla
+- `components/email-signature-template-preview.tsx` - Vista previa de plantilla
+- `components/email-signature-generator.tsx` - Generador de firmas
+- `components/email-signatures-view.tsx` - Vista principal de plantillas
+- `components/email-signatures-table.tsx` - Tabla de plantillas
+- `components/google-font-selector.tsx` - Selector de Google Fonts
+
+##### Páginas Nuevas
+- `app/dashboard/email-signatures/page.tsx` - Listado de plantillas
+- `app/dashboard/email-signatures/new/page.tsx` - Crear plantilla
+- `app/dashboard/email-signatures/[id]/edit/page.tsx` - Editar plantilla
+- `app/dashboard/email-signatures/[id]/edit/email-signature-template-edit-client.tsx` - Cliente de edición
+- `app/dashboard/email-signature-generator/page.tsx` - Generador de firmas
+
+##### API Routes Nuevas
+- `app/api/email-signatures/route.ts` - CRUD de plantillas
+- `app/api/email-signatures/[id]/route.ts` - Operaciones por ID
+
+##### Funciones de Base de Datos
+- `lib/supabase/email-signature.ts` - Funciones de plantillas (completado)
+  - `getAllEmailSignatureTemplates()`
+  - `getEmailSignatureTemplateById()`
+  - `getAvailableTemplatesForUser()`
+  - `createEmailSignatureTemplate()`
+  - `updateEmailSignatureTemplate()`
+  - `deleteEmailSignatureTemplate()`
+
+##### Tipos y Validaciones
+- `lib/types/email-signature.ts` - Tipos de plantillas (actualizado con `google_font`)
+- `lib/validations/schemas.ts` - Esquemas de validación (actualizado)
+  - `createEmailSignatureTemplateSchema`
+  - `updateEmailSignatureTemplateSchema`
+  - `emailSignatureFormSchema`
+
+#### Scripts SQL
+
+- `context/CREATE_EMAIL_SIGNATURE_TEMPLATES.sql` - Tabla y políticas RLS para plantillas
+- `scripts/migrations/add-google-font-to-email-signatures.sql` - Migración para agregar campo `google_font`
+
+#### Funcionalidades Pendientes (Requieren Configuración de Marca)
+
+- ⏳ **Integración con Colores de Marca**
+  - Actualmente las plantillas usan colores hardcodeados
+  - Requiere: Campo `primary_color` y `secondary_color` de `brand_settings`
+  - Acción: Aplicar colores de marca al HTML generado
+
+- ⏳ **Integración con Tipografías de Marca**
+  - Actualmente solo se usa Google Fonts seleccionado manualmente
+  - Requiere: Campo `font_family` de `brand_settings`
+  - Acción: Usar tipografía de marca como fuente predeterminada si no se selecciona Google Font
+
+- ⏳ **Integración con Logo de Marca**
+  - Actualmente se usa `{company_logo}` como variable
+  - Requiere: Campo `logo_url` de `brand_settings` o `companies`
+  - Acción: Aplicar logo de marca automáticamente en plantillas
+
+#### Problemas Resueltos
+
+1. **Aplicación de Google Fonts en emails**
+   - Solución: Uso de `@import` dentro de `<style>` y aplicación global con selector `*`
+   - Estado: ✅ Resuelto
+
+2. **Validación de permisos para plantillas globales**
+   - Solución: Validación en `createEmailSignatureTemplate()` verificando empresa matriz
+   - Estado: ✅ Resuelto
+
+3. **Admin no puede editar plantillas globales**
+   - Solución: Validación en `updateEmailSignatureTemplate()` verificando `is_global`
+   - Estado: ✅ Resuelto
+
+---
+
+### Módulo de Configuración de Marca ⏳ PENDIENTE
+
+**Estado**: No Implementado - Requerido para completar funcionalidades de firmas de correo  
+**Prioridad**: Alta - Necesario para que las firmas usen elementos de marca configurados
+
+#### Funcionalidades Requeridas
+
+- ⏳ **Configuración de Colores de Marca**
+  - Color primario (requerido)
+  - Color secundario (opcional)
+  - Colores adicionales (opcional)
+  - Validación de formato hexadecimal
+  - Vista previa de colores
+
+- ⏳ **Configuración de Tipografías**
+  - Fuente principal (requerida)
+  - Fuentes secundarias (opcional)
+  - Integración con Google Fonts
+  - Vista previa de tipografías
+
+- ⏳ **Gestión de Logos**
+  - Logo principal
+  - Variantes de logo (horizontal, vertical, icono)
+  - Subida y gestión de logos
+  - Almacenamiento en Supabase Storage
+
+- ⏳ **Configuración por Empresa**
+  - Cada empresa (matriz e hijas) puede tener su propia configuración
+  - Empresa matriz puede configurar configuraciones globales
+  - Empresas hijas pueden tener variaciones aprobadas
+
+#### Estructura de Base de Datos Requerida
+
+- ⏳ **Tabla `brand_settings`**
+  - `id` (UUID, PK)
+  - `company_id` (UUID, FK a companies)
+  - `primary_color` (VARCHAR, formato hexadecimal)
+  - `secondary_color` (VARCHAR, formato hexadecimal, nullable)
+  - `font_family` (VARCHAR, nombre de fuente)
+  - `logo_url` (TEXT, URL del logo principal)
+  - `logo_variants` (JSONB, variantes de logo)
+  - `created_at` (TIMESTAMP)
+  - `updated_at` (TIMESTAMP)
+
+#### API Routes Requeridas
+
+- ⏳ **`GET /api/brand-settings`** - Obtener configuración de marca
+- ⏳ **`GET /api/brand-settings/[company_id]`** - Obtener configuración por empresa
+- ⏳ **`POST /api/brand-settings`** - Crear configuración de marca
+- ⏳ **`PUT /api/brand-settings/[id]`** - Actualizar configuración de marca
+- ⏳ **`POST /api/brand-settings/[id]/logo`** - Subir logo
+
+#### Componentes Requeridos
+
+- ⏳ **`BrandSettingsForm`** - Formulario de configuración de marca
+- ⏳ **`ColorPicker`** - Selector de colores
+- ⏳ **`FontSelector`** - Selector de fuentes (integrar con Google Fonts)
+- ⏳ **`LogoUploader`** - Componente para subir logos
+- ⏳ **`BrandSettingsView`** - Vista principal de configuración
+- ⏳ **`BrandPreview`** - Vista previa de marca configurada
+
+#### Integración con Módulo de Firmas
+
+Una vez implementado el módulo de Configuración de Marca, se debe:
+
+1. **Actualizar `EmailSignatureGenerator`**
+   - Cargar configuración de marca de la empresa del usuario
+   - Aplicar colores de marca al HTML generado
+   - Usar tipografía de marca como predeterminada
+   - Aplicar logo de marca automáticamente
+
+2. **Actualizar `applyGoogleFontToHtml()`**
+   - Priorizar tipografía de marca sobre Google Fonts seleccionado
+   - Usar Google Fonts solo si no hay tipografía de marca configurada
+
+3. **Actualizar plantillas**
+   - Incluir variables para colores de marca: `{primary_color}`, `{secondary_color}`
+   - Incluir variable para tipografía: `{brand_font}`
+   - Aplicar estilos de marca automáticamente
+
+---
+
+**Última actualización**: Diciembre 2024  
+**Versión de la implementación**: 1.4.0  
+**Estado**: ✅ Infraestructura base completa + Gestión de perfil de usuario + Gestión de empresas + Gestión de usuarios + Generador de Firma de Correo (provisional) implementadas  
+**Próximo módulo**: ⏳ Configuración de Marca (requerido para completar funcionalidades de firmas)
 

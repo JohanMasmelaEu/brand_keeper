@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Loader2, FileText, Globe, Building2, CheckCircle2 } from "lucide-react"
 import { CheckSealAnimation } from "@/components/check-seal-animation"
+import { applyGoogleFontToHtml } from "@/components/google-font-selector"
 import type {
   CreateEmailSignatureTemplateFormData,
   UpdateEmailSignatureTemplateFormData,
@@ -57,6 +58,12 @@ export function EmailSignatureTemplatePreview({
 
     // Limpiar variables no reemplazadas
     html = html.replace(/\{[^}]+\}/g, "")
+
+    // Aplicar Google Font si está configurada
+    const googleFont = formValues?.google_font || template?.google_font
+    if (googleFont && googleFont.trim() !== "") {
+      html = applyGoogleFontToHtml(html, googleFont)
+    }
 
     return html
   }, [formValues, template, company])

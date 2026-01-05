@@ -193,6 +193,7 @@ export async function createEmailSignatureTemplate(
       description: input.description || null,
       template_type: input.template_type,
       html_content: input.html_content,
+      google_font: input.google_font || null,
       is_global: input.is_global ?? false,
       is_active: input.is_active ?? true,
     })
@@ -260,16 +261,19 @@ export async function updateEmailSignatureTemplate(
     }
   }
 
+  const updateData: Record<string, unknown> = {}
+  
+  if (input.name !== undefined) updateData.name = input.name
+  if (input.description !== undefined) updateData.description = input.description
+  if (input.template_type !== undefined) updateData.template_type = input.template_type
+  if (input.html_content !== undefined) updateData.html_content = input.html_content
+  if (input.google_font !== undefined) updateData.google_font = input.google_font || null
+  if (input.is_global !== undefined) updateData.is_global = input.is_global
+  if (input.is_active !== undefined) updateData.is_active = input.is_active
+
   const { data, error } = await supabase
     .from('email_signature_templates')
-    .update({
-      name: input.name,
-      description: input.description !== undefined ? input.description : undefined,
-      template_type: input.template_type,
-      html_content: input.html_content,
-      is_global: input.is_global,
-      is_active: input.is_active,
-    })
+    .update(updateData)
     .eq('id', templateId)
     .select(`
       *,

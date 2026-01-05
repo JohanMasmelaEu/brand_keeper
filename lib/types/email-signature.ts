@@ -11,6 +11,7 @@ export interface EmailSignatureTemplate {
   description: string | null
   template_type: EmailSignatureTemplateType
   html_content: string
+  google_font: string | null
   is_global: boolean
   is_active: boolean
   created_at: string
@@ -30,6 +31,7 @@ export interface CreateEmailSignatureTemplateInput {
   description?: string | null
   template_type: EmailSignatureTemplateType
   html_content: string
+  google_font?: string | null
   is_global?: boolean
   is_active?: boolean
 }
@@ -39,6 +41,7 @@ export interface UpdateEmailSignatureTemplateInput {
   description?: string | null
   template_type?: EmailSignatureTemplateType
   html_content?: string
+  google_font?: string | null
   is_global?: boolean
   is_active?: boolean
 }
